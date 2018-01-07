@@ -14,6 +14,7 @@ package com.smn.request.sms;
 import com.smn.common.Constants;
 import com.smn.http.HttpMethod;
 import com.smn.request.AbstractRequest;
+import com.smn.response.sms.GetSmsMessageResponse;
 import com.smn.util.StringUtil;
 
 /**
@@ -22,7 +23,7 @@ import com.smn.util.StringUtil;
  * @author zhangyx
  * @version 2.0.0
  */
-public class GetSmsMessageRequest extends AbstractRequest {
+public class GetSmsMessageRequest extends AbstractRequest<GetSmsMessageResponse> {
     /**
      * the message id is send
      */

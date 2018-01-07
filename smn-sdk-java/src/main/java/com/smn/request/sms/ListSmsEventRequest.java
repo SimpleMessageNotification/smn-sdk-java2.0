@@ -15,6 +15,7 @@ import com.smn.common.Constants;
 import com.smn.common.SmsCallbackEventType;
 import com.smn.http.HttpMethod;
 import com.smn.request.AbstractRequest;
+import com.smn.response.sms.ListSmsEventResponse;
 import com.smn.util.StringUtil;
 
 /**
@@ -23,7 +24,7 @@ import com.smn.util.StringUtil;
  * @author zhangyx
  * @version 2.0.0
  */
-public class ListSmsEventRequest extends AbstractRequest {
+public class ListSmsEventRequest extends AbstractRequest<ListSmsEventResponse> {
     /**
      * the sms callback event type
      * {@link SmsCallbackEventType#SMS_CALLBACK_SUCCESS}

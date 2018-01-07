@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smn.common.Constants;
 import com.smn.http.HttpMethod;
 import com.smn.request.AbstractRequest;
+import com.smn.response.sms.UpdateSmsEventResponse;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ import java.util.List;
  * @author zhangyx
  * @version 2.0.0
  */
-public class UpdateSmsEventRequest extends AbstractRequest {
+public class UpdateSmsEventRequest extends AbstractRequest<UpdateSmsEventResponse> {
     /**
      * query result list
      */

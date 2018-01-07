@@ -14,6 +14,7 @@ package com.smn.request.sms;
 import com.smn.common.Constants;
 import com.smn.http.HttpMethod;
 import com.smn.request.AbstractRequest;
+import com.smn.response.sms.ListSmsMsgReportResponse;
 import com.smn.util.ValidationUtil;
 
 /**
@@ -22,7 +23,7 @@ import com.smn.util.ValidationUtil;
  * @author zhangyx
  * @version 2.0.0
  */
-public class ListSmsMsgReportRequest extends AbstractRequest {
+public class ListSmsMsgReportRequest extends AbstractRequest<ListSmsMsgReportResponse> {
     /**
      * query start time
      */
@@ -116,13 +117,13 @@ public class ListSmsMsgReportRequest extends AbstractRequest {
 
     public ListSmsMsgReportRequest setOffset(int offset) {
         this.offset = offset;
-        this.queryMap.put("offset", offset);
+        this.queryMap.put("offset", String.valueOf(offset));
         return this;
     }
 
     public ListSmsMsgReportRequest setLimit(int limit) {
         this.limit = limit;
-        this.queryMap.put("limit", limit);
+        this.queryMap.put("limit", String.valueOf(limit));
         return this;
     }
 
