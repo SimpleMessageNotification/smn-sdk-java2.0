@@ -78,6 +78,10 @@ public class VersionUtil {
         }
     }
 
+    /**
+     * get sdk version
+     * @return
+     */
     public static String getSdkVersion() {
         return "smn-sdk-java/" + getVersion();
     }

@@ -29,8 +29,11 @@ import com.smn.response.topic.DeleteTopicResponse;
 import com.smn.response.topic.ListTopicAttributesResponse;
 import com.smn.response.topic.ListTopicsResponse;
 import com.smn.response.topic.QueryTopicDetailResponse;
+import com.smn.response.topic.TopicInfo;
 import com.smn.response.topic.UpdateTopicAttributeResponse;
 import com.smn.response.topic.UpdateTopicResponse;
+
+import java.util.List;
 
 /**
  * topic demo
@@ -45,6 +48,7 @@ public class TopicDemo {
                 "YourAccountPassword",
                 "YourAccountDomainName",
                 "YourRegionName");
+
         // create topic
         createTopic(smnClient);
 
@@ -159,6 +163,16 @@ public class TopicDemo {
                     + ", request_id:" + res.getRequestId()
                     + ",topicCount:" + res.getTopicCount()
                     + ", errorMessage:" + res.getMessage());
+
+            List<TopicInfo> topics = res.getTopics();
+            for (TopicInfo topicInfo : topics) {
+                System.out.println("TopicInfo{" +
+                        "name='" + topicInfo.getName() + '\'' +
+                        ", topicUrn='" + topicInfo.getTopicUrn() + '\'' +
+                        ", displayName='" + topicInfo.getDisplayName() + '\'' +
+                        ", pushPolicy='" + topicInfo.getPushPolicy() + '\'' +
+                        '}');
+            }
         } catch (Exception e) {
             // 处理异常
             e.printStackTrace();

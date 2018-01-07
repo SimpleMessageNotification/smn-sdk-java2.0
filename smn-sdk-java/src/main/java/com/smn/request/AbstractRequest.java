@@ -18,7 +18,6 @@ import com.smn.http.HttpResponse;
 import com.smn.response.AbstractResponse;
 import com.smn.util.JsonUtil;
 import com.smn.util.StringUtil;
-import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.message.BasicNameValuePair;
@@ -40,10 +39,33 @@ import java.util.Map;
  */
 public abstract class AbstractRequest<T extends AbstractResponse> implements IHttpRequest {
 
+    /**
+     * request headers
+     */
     private Map<String, String> headerMap;
+
+    /**
+     * smn configuration
+     */
     private SmnConfiguration smnConfiguration;
+
+    /**
+     * body parameters
+     * <p>
+     * for post and put method
+     */
     protected Map<String, Object> bodyMap;
+
+    /**
+     * query parameters
+     * <p>
+     * for get method
+     */
     protected Map<String, String> queryMap;
+
+    /**
+     * user project id
+     */
     protected String projectId;
 
     public AbstractRequest() {
@@ -56,14 +78,30 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
 
     public abstract String getUrl();
 
+    /**
+     * get json string of body parameters
+     *
+     * @return the json string
+     */
     public String getBodyParams() {
         return JsonUtil.getJsonStringByMap(bodyMap);
     }
 
+    /**
+     * get he headers
+     *
+     * @return the header map
+     */
     public Map<String, String> getHeaders() {
         return headerMap;
     }
 
+    /**
+     * add head to map
+     *
+     * @param key
+     * @param value
+     */
     public void addHeader(String key, String value) {
         if (headerMap == null) {
             headerMap = new HashMap<String, String>();
@@ -75,14 +113,16 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
         this.projectId = projectId;
     }
 
-    public String getSmnServiceUrl() {
-        return Constants.HTTPS + Constants.SMN + "." + smnConfiguration.getRegionName() + "." + Constants.ENDPOINT;
-    }
-
     public void setSmnConfiguration(SmnConfiguration smnConfiguration) {
         this.smnConfiguration = smnConfiguration;
     }
 
+    /**
+     * parse httpResponse
+     *
+     * @param httpResponse the response data
+     * @return the response entity of the request
+     */
     public T getResponse(HttpResponse httpResponse) {
         try {
             String responseMessage = httpResponse.getContent();
@@ -93,7 +133,7 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
 
             return t;
         } catch (Exception e) {
-            throw new RuntimeException("Fail to convert response, ErrorMessage is " + e.getCause().getMessage());
+            throw new RuntimeException(e);
         }
     }
 
@@ -105,7 +145,7 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
         return projectId;
     }
 
-    public String getQueryString() {
+    protected String getQueryString() {
         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
         for (Map.Entry<String, String> entry : queryMap.entrySet()) {
             String key = entry.getKey();
@@ -127,5 +167,9 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
             param = "?" + param;
         }
         return param;
+    }
+
+    protected String getSmnServiceUrl() {
+        return Constants.HTTPS + Constants.SMN + "." + smnConfiguration.getRegionName() + "." + Constants.ENDPOINT;
     }
 }

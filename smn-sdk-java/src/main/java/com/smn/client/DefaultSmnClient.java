@@ -22,10 +22,9 @@ import com.smn.request.IHttpRequest;
 import com.smn.response.AbstractResponse;
 import com.smn.util.StringUtil;
 import com.smn.util.VersionUtil;
-import org.apache.http.client.methods.CloseableHttpResponse;
 
 /**
- * default smn client for account and password
+ * default smn client use account and password
  *
  * @author zhangyx
  * @version 2.0.0
@@ -52,10 +51,10 @@ public class DefaultSmnClient implements SmnClient {
      * @param userName   the userName to set
      * @param password   the password to set
      * @param domainName the domainName to set
-     * @param regionId   the regionId to set
+     * @param regionName the regionId to set
      */
-    public DefaultSmnClient(String userName, String domainName, String password, String regionId) {
-        this(userName, domainName, password, regionId, null);
+    public DefaultSmnClient(String userName, String domainName, String password, String regionName) {
+        this(userName, domainName, password, regionName, null);
     }
 
     /**
@@ -64,11 +63,11 @@ public class DefaultSmnClient implements SmnClient {
      * @param userName            the userName to set
      * @param password            the password to set
      * @param domainName          the domainName to set
-     * @param regionId            the regionId to set
+     * @param regionName          the regionId to set
      * @param clientConfiguration the client configuration
      */
-    public DefaultSmnClient(String userName, String domainName, String password, String regionId, ClientConfiguration clientConfiguration) {
-        this.smnConfiguration = new SmnConfiguration(userName, password, domainName, regionId);
+    public DefaultSmnClient(String userName, String domainName, String password, String regionName, ClientConfiguration clientConfiguration) {
+        this.smnConfiguration = new SmnConfiguration(userName, password, domainName, regionName);
 
         if (clientConfiguration == null) {
             clientConfiguration = new ClientConfiguration();
@@ -93,7 +92,7 @@ public class DefaultSmnClient implements SmnClient {
         return request.getResponse(httpResponse);
     }
 
-    public void addHeader(IHttpRequest request, String token, String projectId) {
+    private void addHeader(IHttpRequest request, String token, String projectId) {
         if (StringUtil.isEmpty(projectId)) {
             throw new NullPointerException("project id is null");
         }

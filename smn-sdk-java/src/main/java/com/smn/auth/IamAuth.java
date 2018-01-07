@@ -14,11 +14,19 @@ package com.smn.auth;
 import com.smn.config.SmnConfiguration;
 import com.smn.http.HttpResponse;
 import com.smn.http.HttpTool;
+import com.smn.request.auth.GetProjectIdRequest;
 import com.smn.request.auth.IamAuthRequest;
+import com.smn.signer.AkskSigner;
 import com.smn.util.DateUtil;
 import com.smn.util.JsonUtil;
+import com.smn.util.StringUtil;
+import com.smn.util.VersionUtil;
 
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.smn.common.Constants.EXPIRES_AT;
@@ -44,6 +52,7 @@ public class IamAuth {
     private String projectId;
     private String authToken;
     private long expiresTime;
+    private AkskSigner signer;
 
     /**
      * construct
@@ -54,6 +63,19 @@ public class IamAuth {
     public IamAuth(SmnConfiguration smnConfiguration, HttpTool httpTool) {
         this.smnConfiguration = smnConfiguration;
         this.httpTool = httpTool;
+    }
+
+    /**
+     * construct
+     *
+     * @param smnConfiguration
+     * @param httpTool
+     * @param signer
+     */
+    public IamAuth(SmnConfiguration smnConfiguration, HttpTool httpTool, AkskSigner signer) {
+        this.smnConfiguration = smnConfiguration;
+        this.httpTool = httpTool;
+        this.signer = signer;
     }
 
     /**
@@ -72,19 +94,35 @@ public class IamAuth {
         return new String[]{projectId, authToken};
     }
 
+    /**
+     * get the project Id for aksk
+     * @return the project id
+     */
+    public String getProjectId() {
+        if (StringUtil.isEmpty(this.projectId)) {
+            synchronized (this) {
+                if (StringUtil.isEmpty(this.projectId)) {
+                    postForPojectId();
+                }
+            }
+        }
+
+        return this.projectId;
+    }
+
     private void postForIamToken() {
         IamAuthRequest iamAuthRequest = new IamAuthRequest();
         iamAuthRequest.setSmnConfiguration(smnConfiguration);
+        iamAuthRequest.addHeader("X-Smn-sdk", VersionUtil.getSdkVersion());
+
         HttpResponse response = null;
         try {
             // execute HTTPS post
             response = httpTool.getHttpResponse(iamAuthRequest);
 
-            int status = response.getHttpCode();
-            // The length of the response will not be too long
-
-            String responseMessage = response.getContent();
-            if (status >= 200 && status < 300) {
+            if (response.isSuccess()) {
+                // The length of the response will not be too long
+                String responseMessage = response.getContent();
                 // get IAM token
                 this.authToken = response.getHeaders().get(X_SUBJECT_TOKEN);
                 Map<String, Object> messageMap = JsonUtil.parseJsonMessage(responseMessage);
@@ -97,9 +135,43 @@ public class IamAuth {
                 this.expiresTime = tempDate.getTime() - expiredInterval;
             } else {
                 throw new RuntimeException(
-                        "Unexpected response status: " + status + ", ErrorMessage is " + responseMessage);
+                        "Unexpected response status: " + response.getHttpCode() + ", ErrorMessage is " + response.getContent());
             }
 
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void postForPojectId() {
+        GetProjectIdRequest request = new GetProjectIdRequest();
+        request.setName(smnConfiguration.getRegionName());
+        request.addHeader("X-Smn-sdk", VersionUtil.getSdkVersion());
+
+        HttpResponse response = null;
+        try {
+            // 签名处理
+            signer.get(request, new URL(request.getUrl()));
+
+            // execute HTTPS post
+            response = httpTool.getHttpResponse(request);
+            // The length of the response will not be too long
+            String responseMessage = response.getContent();
+            if (response.isSuccess()) {
+                Map<String, Object> messageMap = JsonUtil.parseJsonMessage(responseMessage);
+                List projectList = (ArrayList) messageMap.get("projects");
+                if (projectList == null || projectList.size() == 0) {
+                    throw new RuntimeException("Fail to get project id by aksk auth. projects is empty.");
+                }
+                this.projectId = (String) ((HashMap) (projectList).get(0)).get("id");
+            } else {
+                throw new RuntimeException("Fail to get project id by aksk auth. http response status: " + response.getHttpCode());
+            }
+
+            if (StringUtil.isEmpty(this.projectId)) {
+                throw new RuntimeException("Fail to get project id by aksk auth. project id is null");
+
+            }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

@@ -22,5 +22,12 @@ import com.smn.response.AbstractResponse;
  */
 public interface SmnClient {
 
+    /**
+     * send the request and get response
+     *
+     * @param request the request to send
+     * @param <T>
+     * @return response data
+     */
     <T extends AbstractResponse> T sendRequest(AbstractRequest<T> request);
 }

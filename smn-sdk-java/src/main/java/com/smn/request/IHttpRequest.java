@@ -23,15 +23,46 @@ import java.util.Map;
  */
 public interface IHttpRequest {
 
+    /**
+     * get http method {@link HttpMethod}
+     *
+     * @return {@link HttpMethod}
+     */
     HttpMethod getHttpMethod();
 
+    /**
+     * get url of the request
+     *
+     * @return url string
+     */
     String getUrl();
 
+    /**
+     * get json string of body parameters
+     *
+     * @return the json string
+     */
     String getBodyParams();
 
+    /**
+     * get he headers
+     *
+     * @return the header map
+     */
     Map<String, String> getHeaders();
 
+    /**
+     * add head to map
+     *
+     * @param key
+     * @param value
+     */
     void addHeader(String key, String value);
 
+    /**
+     * set project id
+     *
+     * @param projectId
+     */
     void setProjectId(String projectId);
 }

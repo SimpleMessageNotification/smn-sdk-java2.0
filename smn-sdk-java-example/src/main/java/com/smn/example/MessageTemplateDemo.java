@@ -21,8 +21,11 @@ import com.smn.request.template.UpdateMessageTemplateRequest;
 import com.smn.response.template.CreateMessageTemplateResponse;
 import com.smn.response.template.DeleteMessageTemplateResponse;
 import com.smn.response.template.ListMessageTemplatesResponse;
+import com.smn.response.template.MessageTemplateListInfo;
 import com.smn.response.template.QueryMessageTemplateDetailResponse;
 import com.smn.response.template.UpdateMessageTemplateResponse;
+
+import java.util.List;
 
 /**
  * message template demo
@@ -123,11 +126,23 @@ public class MessageTemplateDemo {
         // 发送请求
         try {
             ListMessageTemplatesResponse res = smnClient.sendRequest(smnRequest);
+            List<MessageTemplateListInfo> listInfos = res.getMessageTemplates();
             System.out.println("httpCode:" + res.getHttpCode()
                     + ", request_id:" + res.getRequestId()
                     + ", message_templates" + res.getMessageTemplates()
                     + ", message_template_count" + res.getMessageTemplateCount()
                     + ", errormessage:" + res.getMessage());
+
+            for (MessageTemplateListInfo info : listInfos) {
+                System.out.println("{" +
+                        "messageTemplateName='" + info.getMessageTemplateName() + '\'' +
+                        ", createTime='" + info.getCreateTime() + '\'' +
+                        ", updateTime='" + info.getUpdateTime() + '\'' +
+                        ", messageTemplateId='" + info.getMessageTemplateId() + '\'' +
+                        ", tagNames=" + info.getTagNames() +
+                        ", protocol='" + info.getProtocol() + '\'' +
+                        '}');
+            }
         } catch (Exception e) {
             // 处理异常
             e.printStackTrace();

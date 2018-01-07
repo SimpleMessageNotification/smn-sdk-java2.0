@@ -24,8 +24,19 @@ import java.util.Map;
  */
 public class HttpResponse {
 
+    /**
+     * http status code
+     */
     private int httpCode;
+
+    /**
+     * http response data string
+     */
     private String content;
+
+    /**
+     * response headers
+     */
     private Map<String, String> headers;
 
 

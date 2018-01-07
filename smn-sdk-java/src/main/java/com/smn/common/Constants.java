@@ -22,6 +22,7 @@ public class Constants {
     private Constants() {
     }
 
+    public final static String SMN_SERVICE_NAME = "SMN";
     public final static String DEFAULT_CONTENT_TYPE = "application/json; charset=UTF-8";
     public final static String DEFAULT_CHARSET = "UTF-8";
     public static final String HTTPS = "https://";
@@ -31,6 +32,7 @@ public class Constants {
     public static final String URL_DELIMITER = "/";
     public static final String V2 = "v2";
     public static final String IAM_TOKEN_URI = "/v3/auth/tokens";
+    public static final String IAM_PROJECT_URL = "/v3/projects";
     public static final String X_SUBJECT_TOKEN = "X-Subject-Token";
     public static final String TOKEN = "token";
     public static final String ID = "id";

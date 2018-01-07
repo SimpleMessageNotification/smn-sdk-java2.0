@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author zhangyx
  * @version 2.0.0
  */
-public class SmsCallback {
+public class SmsCallbackInfo {
 
     @JsonProperty("event_type")
     private String eventType;

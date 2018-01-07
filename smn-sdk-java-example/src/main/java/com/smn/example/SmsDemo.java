@@ -27,7 +27,9 @@ import com.smn.response.sms.GetSmsMessageResponse;
 import com.smn.response.sms.ListSmsEventResponse;
 import com.smn.response.sms.ListSmsMsgReportResponse;
 import com.smn.response.sms.ListSmsSignsResponse;
+import com.smn.response.sms.SmsCallbackInfo;
 import com.smn.response.sms.SmsPublishResponse;
+import com.smn.response.sms.SmsSignInfo;
 import com.smn.response.sms.UpdateSmsEventResponse;
 
 import java.util.ArrayList;
@@ -64,6 +66,7 @@ public class SmsDemo {
 
         //ListSmsEvent
         listSmsEvent(smnClient);
+
         // update sms event
         updateSmsEvent(smnClient);
     }
@@ -109,6 +112,17 @@ public class SmsDemo {
                     + ",smsSignCount:" + res.getSmsSignCount() +
                     ", request_id:" + res.getRequestId()
                     + ", errormessage:" + res.getMessage());
+
+            List<SmsSignInfo> infos = res.getSmsSigns();
+            for(SmsSignInfo info : infos) {
+                System.out.println("SmsSignInfo{" +
+                        "signName='" + info.getSignName() + '\'' +
+                        ", createTime='" + info.getCreateTime() + '\'' +
+                        ", signId='" + info.getSignId() + '\'' +
+                        ", reply='" + info.getReply() + '\'' +
+                        ", status=" + info.getStatus() +
+                        '}');
+            }
         } catch (Exception e) {
             // 处理异常
             e.printStackTrace();
@@ -195,15 +209,23 @@ public class SmsDemo {
         ListSmsEventRequest smnRequest = new ListSmsEventRequest();
 
         //设置参数
-        smnRequest.setEventType("sms_reply_event");
+        //smnRequest.setEventType("sms_reply_event");
 
         // 发送短信
         try {
             ListSmsEventResponse res = smnClient.sendRequest(smnRequest);
+            List<SmsCallbackInfo> infos = res.getCallback();
             System.out.println("httpCode:" + res.getHttpCode()
                     + ", request_id:" + res.getRequestId()
                     + ", message" + res.getMessage()
                     + ", errormessage:" + res.getMessage());
+
+            for (SmsCallbackInfo info : infos) {
+                System.out.println("{" +
+                        "eventType='" + info.getEventType() + '\'' +
+                        ", topicUrn='" + info.getTopicUrn() + '\'' +
+                        '}');
+            }
         } catch (Exception e) {
             // 处理异常
             e.printStackTrace();

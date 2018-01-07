@@ -72,11 +72,19 @@ public class JsonUtil {
         return "{}";
     }
 
+    /**
+     * parse json string to object
+     *
+     * @param json   the json string to parse
+     * @param tClass the Object class type
+     * @param <T>
+     * @return the Object
+     */
     public static final <T> T parseJsonToObject(String json, Class<T> tClass) {
         try {
             return OBJMAPPER.readValue(json, tClass);
         } catch (IOException e) {
-            return null;
+            throw new RuntimeException(e);
         }
     }
 }

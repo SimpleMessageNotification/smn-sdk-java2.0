@@ -25,16 +25,16 @@ import java.util.List;
 public class ListSmsEventResponse extends AbstractResponse {
 
     @JsonProperty("callback")
-    private List<SmsCallback> callback;
+    private List<SmsCallbackInfo> callback;
 
     @JsonProperty("topic_urn")
     private String topicUrn;
 
-    public List<SmsCallback> getCallback() {
+    public List<SmsCallbackInfo> getCallback() {
         return callback;
     }
 
-    public void setCallback(List<SmsCallback> callback) {
+    public void setCallback(List<SmsCallbackInfo> callback) {
         this.callback = callback;
     }
 

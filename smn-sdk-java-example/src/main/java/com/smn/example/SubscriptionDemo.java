@@ -20,7 +20,10 @@ import com.smn.request.subscription.UnsubscribeRequest;
 import com.smn.response.subscription.ListSubscriptionsByTopicResponse;
 import com.smn.response.subscription.ListSubscriptionsResponse;
 import com.smn.response.subscription.SubscribeResponse;
+import com.smn.response.subscription.SubscriptionInfo;
 import com.smn.response.subscription.UnsubscribeResponse;
+
+import java.util.List;
 
 /**
  * subscription demo
@@ -39,7 +42,7 @@ public class SubscriptionDemo {
         //subscribe
         subscribe(smnClient);
 
-        //list subscriptions
+        // list subscriptions
         listSubscriptions(smnClient);
 
         // list subscriptions by topic
@@ -94,11 +97,24 @@ public class SubscriptionDemo {
         // 发送请求
         try {
             ListSubscriptionsResponse res = smnClient.sendRequest(smnRequest);
+            List<SubscriptionInfo> subscriptionInfoList = res.getSubscriptions();
             System.out.println("httpCode:" + res.getHttpCode()
                     + ", request_id:" + res.getRequestId()
                     + ", subscription_count:" + res.getSubscriptionCount()
+                    + ", firstCount: " + subscriptionInfoList.size()
                     + ", subscriptions:" + res.getSubscriptions()
                     + ", errormessage:" + res.getMessage());
+            for (SubscriptionInfo info : subscriptionInfoList) {
+                System.out.println("{" +
+                        "topicUrn='" + info.getTopicUrn() + '\'' +
+                        ", protocol='" + info.getProtocol() + '\'' +
+                        ", subscriptionUrn='" + info.getSubscriptionUrn() + '\'' +
+                        ", owner='" + info.getOwner() + '\'' +
+                        ", endpoint='" + info.getEndpoint() + '\'' +
+                        ", remark='" + info.getRemark() + '\'' +
+                        ", status=" + info.getStatus() +
+                        '}');
+            }
         } catch (Exception e) {
             // 处理异常
             e.printStackTrace();
@@ -122,11 +138,24 @@ public class SubscriptionDemo {
         // 发送请求
         try {
             ListSubscriptionsByTopicResponse res = smnClient.sendRequest(smnRequest);
+            List<SubscriptionInfo> subscriptionInfoList = res.getSubscriptions();
             System.out.println("httpCode:" + res.getHttpCode()
                     + ", request_id:" + res.getRequestId()
                     + ", subscription_count:" + res.getSubscriptionCount()
                     + ", subscriptions:" + res.getSubscriptions()
                     + ", errormessage:" + res.getMessage());
+
+            for (SubscriptionInfo info : subscriptionInfoList) {
+                System.out.println("{" +
+                        "topicUrn='" + info.getTopicUrn() + '\'' +
+                        ", protocol='" + info.getProtocol() + '\'' +
+                        ", subscriptionUrn='" + info.getSubscriptionUrn() + '\'' +
+                        ", owner='" + info.getOwner() + '\'' +
+                        ", endpoint='" + info.getEndpoint() + '\'' +
+                        ", remark='" + info.getRemark() + '\'' +
+                        ", status=" + info.getStatus() +
+                        '}');
+            }
         } catch (Exception e) {
             // 处理异常
             e.printStackTrace();
