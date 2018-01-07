@@ -84,10 +84,10 @@ public class DefaultSmnClient implements SmnClient {
      * @see SmnClient#sendRequest(AbstractRequest)
      */
     public <T extends AbstractResponse> T sendRequest(AbstractRequest<T> request) {
-        String[] arrys = this.iamAuth.getTokenAndProjectId();
+        String[] arrays = this.iamAuth.getTokenAndProjectId();
         request.setSmnConfiguration(this.smnConfiguration);
-        addHeader(request, arrys[1], arrys[0]);
-        request.setProjectId(arrys[0]);
+        addHeader(request, arrays[1], arrays[0]);
+        request.setProjectId(arrays[0]);
         HttpResponse httpResponse = httpTool.getHttpResponse(request);
 
         return request.getResponse(httpResponse);
@@ -95,7 +95,7 @@ public class DefaultSmnClient implements SmnClient {
 
     public void addHeader(IHttpRequest request, String token, String projectId) {
         if (StringUtil.isEmpty(projectId)) {
-            throw new RuntimeException("project id is null");
+            throw new NullPointerException("project id is null");
         }
         request.addHeader("region", smnConfiguration.getRegionName());
         request.addHeader("X-Auth-Token", token);
