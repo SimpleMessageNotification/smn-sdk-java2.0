@@ -17,11 +17,19 @@ import com.smn.http.HttpMethod;
 import com.smn.http.HttpResponse;
 import com.smn.response.AbstractResponse;
 import com.smn.util.JsonUtil;
+import com.smn.util.StringUtil;
 import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,13 +43,13 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
     private Map<String, String> headerMap;
     private SmnConfiguration smnConfiguration;
     protected Map<String, Object> bodyMap;
-    protected Map<String, Object> queryMap;
+    protected Map<String, String> queryMap;
     protected String projectId;
 
     public AbstractRequest() {
         this.headerMap = new HashMap<String, String>();
         this.bodyMap = new HashMap<String, Object>();
-        this.queryMap = new HashMap<String, Object>();
+        this.queryMap = new HashMap<String, String>();
     }
 
     public abstract HttpMethod getHttpMethod();
@@ -95,5 +103,29 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
 
     public String getProjectId() {
         return projectId;
+    }
+
+    public String getQueryString() {
+        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+        for (Map.Entry<String, String> entry : queryMap.entrySet()) {
+            String key = entry.getKey();
+            String val = entry.getValue();
+            if (val != null) {
+                nameValuePairs.add(new BasicNameValuePair(key, val));
+            }
+        }
+        String param = "";
+        if (!nameValuePairs.isEmpty()) {
+            try {
+                param = EntityUtils.toString(new UrlEncodedFormEntity(nameValuePairs, Charset.forName("UTF-8")));
+            } catch (IOException e) {
+                throw new RuntimeException("get request param error");
+            }
+        }
+
+        if (!StringUtil.isEmpty(param)) {
+            param = "?" + param;
+        }
+        return param;
     }
 }

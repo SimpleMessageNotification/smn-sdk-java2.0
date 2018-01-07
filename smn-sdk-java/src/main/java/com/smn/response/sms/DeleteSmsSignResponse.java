@@ -9,18 +9,16 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * Apache License, Version 2.0 for more details.
  */
-package com.smn.client;
+package com.smn.response.sms;
 
-import com.smn.request.AbstractRequest;
 import com.smn.response.AbstractResponse;
 
 /**
- * smn client interface
+ * the response data for delete sms sign
  *
  * @author zhangyx
  * @version 2.0.0
  */
-public interface SmnClient {
+public class DeleteSmsSignResponse extends AbstractResponse {
 
-    <T extends AbstractResponse> T sendRequest(AbstractRequest<T> request);
 }
