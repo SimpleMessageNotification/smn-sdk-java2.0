@@ -93,7 +93,7 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
 
             return t;
         } catch (Exception e) {
-            throw new RuntimeException("Fail to convert response, ErrorMessage is " + e.getMessage());
+            throw new RuntimeException("Fail to convert response, ErrorMessage is " + e.getCause().getMessage());
         }
     }
 

@@ -72,4 +72,13 @@ public abstract class AbstractResponse {
     public void setContentString(String contentString) {
         this.contentString = contentString;
     }
+
+    /**
+     * Judge whether the request is successful or not
+     * @return if success return true, else return false
+     */
+    public boolean isSuccess()
+    {
+        return  200 <= httpCode && httpCode < 300;
+    }
 }

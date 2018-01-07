@@ -11,7 +11,6 @@
  */
 package com.smn.request.sms;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smn.common.Constants;
 import com.smn.http.HttpMethod;
 import com.smn.request.AbstractRequest;
@@ -41,6 +40,7 @@ public class UpdateSmsEventRequest extends AbstractRequest<UpdateSmsEventRespons
         }
 
         StringBuilder sb = new StringBuilder();
+        sb.append(getSmnServiceUrl());
         sb.append(Constants.URL_DELIMITER).append(Constants.V2).append(Constants.URL_DELIMITER)
                 .append(projectId).append(Constants.URL_DELIMITER).append(Constants.SMN_NOTIFICATIONS)
                 .append(Constants.URL_DELIMITER).append(Constants.SMN_SUB_PROTOCOL_SMS)
@@ -60,68 +60,3 @@ public class UpdateSmsEventRequest extends AbstractRequest<UpdateSmsEventRespons
     }
 }
 
-/**
- * sms callback entity
- *
- * @author zhangyx
- * @version 0.8
- */
-class SmsCallback {
-    /**
-     * callback event type
-     */
-    @JsonProperty("event_type")
-    private String eventType;
-
-    /**
-     * topic urn
-     */
-    @JsonProperty("topic_urn")
-    private String topicUrn;
-
-    /**
-     * no args construct
-     */
-    public SmsCallback() {
-
-    }
-
-    /**
-     * construct
-     *
-     * @param eventType the eventType to set
-     * @param topicUrn  the topicUrn to st
-     */
-    public SmsCallback(String eventType, String topicUrn) {
-        this.eventType = eventType;
-        this.topicUrn = topicUrn;
-    }
-
-    /**
-     * @return the event_type
-     */
-    public String getEventType() {
-        return eventType;
-    }
-
-    /**
-     * @param eventType the eventType to set
-     */
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
-
-    /**
-     * @return eht topic_urn
-     */
-    public String getTopicUrn() {
-        return topicUrn;
-    }
-
-    /**
-     * @param topicUrn the topic_urn to set
-     */
-    public void setTopicUrn(String topicUrn) {
-        this.topicUrn = topicUrn;
-    }
-}

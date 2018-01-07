@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.smn.response.AbstractResponse;
 
 import java.util.Dictionary;
+import java.util.Map;
 
 /**
  * the response data of list topic attributes
@@ -25,13 +26,13 @@ import java.util.Dictionary;
 public class ListTopicAttributesResponse extends AbstractResponse {
 
     @JsonProperty("attributes")
-    private Dictionary<String, Object> attributes;
+    private Map<String, Object> attributes;
 
-    public Dictionary<String, Object> getAttributes() {
+    public Map<String, Object> getAttributes() {
         return attributes;
     }
 
-    public void setAttributes(Dictionary<String, Object> attributes) {
+    public void setAttributes(Map<String, Object> attributes) {
         this.attributes = attributes;
     }
 }

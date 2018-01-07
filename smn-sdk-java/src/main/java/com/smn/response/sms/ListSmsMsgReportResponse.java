@@ -24,10 +24,10 @@ import java.util.List;
  */
 public class ListSmsMsgReportResponse extends AbstractResponse {
 
-    @JsonProperty("data")
+    @JsonProperty("count")
     private int count;
 
-    @JsonProperty("count")
+    @JsonProperty("data")
     private List<SmsReportData> data;
 
     public int getCount() {
@@ -47,121 +47,3 @@ public class ListSmsMsgReportResponse extends AbstractResponse {
     }
 }
 
-/**
- * Sms report data
- *
- * @author zhangyx
- * @version 2.0.0
- */
-class SmsReportData {
-
-    @JsonProperty("message_id")
-    private String messageId;
-
-    @JsonProperty("status")
-    private int status;
-
-    @JsonProperty("sign_id")
-    private String signId;
-
-    @JsonProperty("status_desc")
-    private String statusDesc;
-
-    @JsonProperty("fee_num")
-    private int feeNum;
-
-    @JsonProperty("extend_code")
-    private String extendCode;
-
-    @JsonProperty("nation_code")
-    private String nationCode;
-
-    @JsonProperty("mobile")
-    private String mobile;
-
-    @JsonProperty("submit_time")
-    private String submitTime;
-
-    @JsonProperty("deliver_time")
-    private String deliverTime;
-
-    public String getMessageId() {
-        return messageId;
-    }
-
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getSignId() {
-        return signId;
-    }
-
-    public void setSignId(String signId) {
-        this.signId = signId;
-    }
-
-    public String getStatusDesc() {
-        return statusDesc;
-    }
-
-    public void setStatusDesc(String statusDesc) {
-        this.statusDesc = statusDesc;
-    }
-
-    public int getFeeNum() {
-        return feeNum;
-    }
-
-    public void setFeeNum(int feeNum) {
-        this.feeNum = feeNum;
-    }
-
-    public String getExtendCode() {
-        return extendCode;
-    }
-
-    public void setExtendCode(String extendCode) {
-        this.extendCode = extendCode;
-    }
-
-    public String getNationCode() {
-        return nationCode;
-    }
-
-    public void setNationCode(String nationCode) {
-        this.nationCode = nationCode;
-    }
-
-    public String getMobile() {
-        return mobile;
-    }
-
-    public void setMobile(String mobile) {
-        this.mobile = mobile;
-    }
-
-    public String getSubmitTime() {
-        return submitTime;
-    }
-
-    public void setSubmitTime(String submitTime) {
-        this.submitTime = submitTime;
-    }
-
-    public String getDeliverTime() {
-        return deliverTime;
-    }
-
-    public void setDeliverTime(String deliverTime) {
-        this.deliverTime = deliverTime;
-    }
-}

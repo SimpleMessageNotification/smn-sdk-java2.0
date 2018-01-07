@@ -21,13 +21,19 @@ import com.smn.response.publish.PublishResponse;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * publish demo
+ *
+ * @author zhangyx
+ * @version 2.0.0
+ */
 public class PublishDemo {
     public static void main(String[] args) {
         SmnClient smnClient = new DefaultSmnClient(
                 "YourAccountUserName",
                 "YourAccountPassword",
                 "YourAccountDomainName",
-                "YourRegionId");
+                "YourRegionName");
 
         // publish with text message
         publishWithMessage(smnClient);

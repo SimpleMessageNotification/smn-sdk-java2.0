@@ -9,33 +9,36 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * Apache License, Version 2.0 for more details.
  */
-package com.smn.response.sms;
+package com.smn.response.topic;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.smn.response.AbstractResponse;
-
-import java.util.List;
 
 /**
- * the response data of list Sms event
+ * topic info
  *
  * @author zhangyx
  * @version 2.0.0
  */
-public class ListSmsEventResponse extends AbstractResponse {
+public class TopicInfo {
 
-    @JsonProperty("callback")
-    private List<SmsCallback> callback;
+    @JsonProperty("name")
+    private String name;
 
     @JsonProperty("topic_urn")
     private String topicUrn;
 
-    public List<SmsCallback> getCallback() {
-        return callback;
+    @JsonProperty("display_name")
+    private String displayName;
+
+    @JsonProperty("push_policy")
+    private String pushPolicy;
+
+    public String getName() {
+        return name;
     }
 
-    public void setCallback(List<SmsCallback> callback) {
-        this.callback = callback;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getTopicUrn() {
@@ -45,6 +48,20 @@ public class ListSmsEventResponse extends AbstractResponse {
     public void setTopicUrn(String topicUrn) {
         this.topicUrn = topicUrn;
     }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
+    public String getPushPolicy() {
+        return pushPolicy;
+    }
+
+    public void setPushPolicy(String pushPolicy) {
+        this.pushPolicy = pushPolicy;
+    }
 }
-
-

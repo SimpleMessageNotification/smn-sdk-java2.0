@@ -101,13 +101,7 @@ public class IamAuth {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get auth token, ErrorMessage is " + e.getMessage());
-        } finally {
-//            try {
-//                response.close();
-//            } catch (IOException e) {
-//                // do nothing
-//            }
+            throw new RuntimeException(e);
         }
     }
 

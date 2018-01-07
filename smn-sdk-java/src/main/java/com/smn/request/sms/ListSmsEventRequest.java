@@ -28,7 +28,7 @@ public class ListSmsEventRequest extends AbstractRequest<ListSmsEventResponse> {
     /**
      * the sms callback event type
      * {@link SmsCallbackEventType#SMS_CALLBACK_SUCCESS}
-     * {@link SmsCallbackEventType#SMS_CALLBACK_SUCCESS}
+     * {@link SmsCallbackEventType#SMS_CALLBACK_FAIL}
      * {@link SmsCallbackEventType#SMS_CALLBACK_REPLY}
      */
     private String eventType;
@@ -38,11 +38,12 @@ public class ListSmsEventRequest extends AbstractRequest<ListSmsEventResponse> {
     }
 
     public String getUrl() {
-        if (!StringUtil.isBlank(eventType)) {
+        if (StringUtil.isBlank(eventType)) {
             throw new IllegalArgumentException("event_type is invalid.");
         }
 
         StringBuilder sb = new StringBuilder();
+        sb.append(getSmnServiceUrl());
         sb.append(Constants.URL_DELIMITER).append(Constants.V2).append(Constants.URL_DELIMITER)
                 .append(projectId).append(Constants.URL_DELIMITER).append(Constants.SMN_NOTIFICATIONS)
                 .append(Constants.URL_DELIMITER).append(Constants.SMN_SUB_PROTOCOL_SMS)

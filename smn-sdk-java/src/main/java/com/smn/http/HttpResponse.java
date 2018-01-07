@@ -55,4 +55,13 @@ public class HttpResponse {
             this.headers.put(header.getName(), header.getValue());
         }
     }
+
+    /**
+     * Judge whether the request is successful or not
+     * @return if success return true, else return false
+     */
+    public boolean isSuccess()
+    {
+        return  200 <= httpCode && httpCode < 300;
+    }
 }

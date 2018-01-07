@@ -76,6 +76,7 @@ public class ListSmsMsgReportRequest extends AbstractRequest<ListSmsMsgReportRes
         }
 
         StringBuilder sb = new StringBuilder();
+        sb.append(getSmnServiceUrl());
         sb.append(Constants.URL_DELIMITER).append(Constants.V2).append(Constants.URL_DELIMITER)
                 .append(projectId).append(Constants.URL_DELIMITER).append(Constants.SMN_NOTIFICATIONS)
                 .append(Constants.URL_DELIMITER).append(Constants.SMN_SUB_PROTOCOL_SMS)

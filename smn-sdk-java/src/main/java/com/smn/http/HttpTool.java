@@ -98,7 +98,7 @@ public class HttpTool {
             httpResponse.setHeaders(response.getAllHeaders());
             return httpResponse;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get response, ErrorMessage is " + e.getMessage());
+            throw new RuntimeException(e);
         } finally {
             try {
                 if (response != null) {
