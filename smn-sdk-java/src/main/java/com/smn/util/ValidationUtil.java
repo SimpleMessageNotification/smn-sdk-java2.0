@@ -34,16 +34,6 @@ public class ValidationUtil {
     final static Pattern PATTERN_TELEPHONE = Pattern.compile("^\\+?[0-9]+$");
 
     /**
-     * validate sms sigature regex
-     */
-    final static Pattern PATTERN_SMS_SIGN_NAME = Pattern.compile("[a-zA-Z0-9\\u4e00-\\u9fa5]{2,8}");
-
-    /**
-     * validate Email regex
-     */
-    final static Pattern PATTERN_EMAIL = Pattern.compile("^[a-zA-Z0-9]+([._\\-]*[a-zA-Z0-9])*@([a-zA-Z0-9]+[-a-zA-Z0-9]*[a-zA-Z0-9]+.){1,63}[a-zA-Z0-9]+$");
-
-    /**
      * validate templateName
      */
     final static Pattern PATTERN_TMPLATE_NAME = Pattern.compile("^[a-zA-Z0-9]{1}([-_a-zA-Z0-9]){0,64}");
@@ -85,92 +75,6 @@ public class ValidationUtil {
         }
 
         return PATTERN_TELEPHONE.matcher(telephone).matches();
-    }
-
-    /**
-     * validate signName if conform to rule
-     * <p>
-     * parameters smsSignName must be upper or lower ASCII characters,digits or
-     * chinese.generally 3-8
-     *
-     * @param smsSignName signName to be validated
-     * @return boolean <code>true</code> conform to rule will be true,or false
-     */
-    public static final boolean validateSmsSignName(String smsSignName) {
-
-        if (StringUtil.isEmpty(smsSignName)) {
-            return false;
-        }
-        return PATTERN_SMS_SIGN_NAME.matcher(smsSignName).matches();
-    }
-
-    /**
-     * validate project_id
-     *
-     * @param projectId the project Id to validate
-     * @return boolean
-     * if valid return <code>true</code>, else return <code>false</code>
-     */
-    public static boolean validateProjectId(String projectId) {
-        if (StringUtil.isBlank(projectId)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * validate TopicUrn
-     *
-     * @param topicUrn the topic_urn to validate
-     * @return boolean
-     * if valid return <code>true</code>, else return <code>false</code>
-     */
-    public static boolean validateTopicUrn(String topicUrn) {
-        if (StringUtil.isBlank(topicUrn)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * validate EndPoint
-     *
-     * @param endPoint the endPoint to validate
-     * @param protocol the protocol tto validate
-     * @return boolean
-     * if valid return <code>true</code>, else return <code>false</code>
-     */
-    public static boolean validateEndPoint(String endPoint, String protocol) {
-        if (StringUtil.isBlank(endPoint)) {
-            return false;
-        }
-        if ("http".equals(protocol) && endPoint.startsWith("http://")) {
-            return true;
-        }
-        if ("https".equals(protocol) && endPoint.startsWith("https://")) {
-            return true;
-        }
-        if ("email".equals(protocol) && validateEmail(endPoint)) {
-            return true;
-        }
-        if ("sms".equals(protocol) && validateTelephone(endPoint)) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * validate Email
-     *
-     * @param email the email to validate
-     * @return boolean
-     * if valid return <code>true</code>, else return <code>false</code>
-     */
-    public static boolean validateEmail(String email) {
-        if (StringUtil.isEmpty(email)) {
-            return false;
-        }
-        return PATTERN_EMAIL.matcher(email).matches();
     }
 
     /**
@@ -243,14 +147,13 @@ public class ValidationUtil {
      * @return boolean
      * if valid return <code>true</code>, else return <code>false</code>
      */
-    public static boolean validateMessageStructure(Map<String, Object> structure) {
-        if (structure == null || structure.isEmpty()) {
+    public static boolean validateMessageStructureLength(String structure) {
+        if (StringUtil.isEmpty(structure)) {
             return false;
         }
 
         try {
-            String content = JsonUtil.getJsonStringByMap(structure);
-            byte[] b = content.getBytes(Constants.DEFAULT_CHARSET);
+            byte[] b = structure.getBytes(Constants.DEFAULT_CHARSET);
             return b.length < MAX_TEMPLATE_MESSAGE_CONTENT_LENGTH;
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("validate template message content error");

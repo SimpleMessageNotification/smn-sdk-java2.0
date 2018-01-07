@@ -1,3 +1,14 @@
+/*
+ * Copyright (C) 2018. Huawei Technologies Co., LTD. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of Apache License, Version 2.0.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Apache License, Version 2.0 for more details.
+ */
 package com.smn.example;
 
 import com.smn.client.DefaultSmnClient;
@@ -23,7 +34,7 @@ public class SmsDemo {
         // 构造请求对象
         SmsPublishRequest smsPublishRequest = new SmsPublishRequest();
 
-        // 设置手机号码
+        // 设置参数
         smsPublishRequest.setEndpoint("+861368***587")
                 .setMessage("您的验证码是:1234，请查收")
                 .setSignId("6be340e91e5241e4b5d85837e6709104");

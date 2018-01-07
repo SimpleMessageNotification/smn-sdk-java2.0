@@ -15,6 +15,7 @@ import com.smn.common.Constants;
 import com.smn.http.HttpMethod;
 import com.smn.request.AbstractRequest;
 import com.smn.response.publish.PublishResponse;
+import com.smn.util.JsonUtil;
 import com.smn.util.StringUtil;
 import com.smn.util.ValidationUtil;
 
@@ -55,7 +56,7 @@ public class PublishWithStructureRequest extends AbstractRequest<PublishResponse
             throw new IllegalArgumentException("subject is invalid");
         }
 
-        if (!ValidationUtil.validateMessageStructure(messageStructure)) {
+        if (!ValidationUtil.validateMessageStructureLength((String)this.bodyMap.get("message_structure"))) {
             throw new IllegalArgumentException("message structure is oversize");
         }
 
@@ -85,7 +86,7 @@ public class PublishWithStructureRequest extends AbstractRequest<PublishResponse
 
     public PublishWithStructureRequest setMessageStructure(Map<String, Object> messageStructure) {
         this.messageStructure = messageStructure;
-        this.bodyMap.put("message_structure", messageStructure);
+        this.bodyMap.put("message_structure", JsonUtil.getJsonStringByMap(messageStructure));
         return this;
     }
 
