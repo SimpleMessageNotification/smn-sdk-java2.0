@@ -68,11 +68,11 @@ public class ListSmsMsgReportRequest extends AbstractRequest<ListSmsMsgReportRes
 
     public String getUrl() {
         if (!ValidationUtil.validateOffset(offset)) {
-            throw new RuntimeException("offset is invalid.");
+            throw new IllegalArgumentException("offset is invalid.");
         }
 
         if (!ValidationUtil.validateLimit(limit)) {
-            throw new RuntimeException("limit is invalid.");
+            throw new IllegalArgumentException("limit is invalid.");
         }
 
         StringBuilder sb = new StringBuilder();

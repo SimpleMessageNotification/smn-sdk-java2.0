@@ -39,7 +39,7 @@ public class ListSmsEventRequest extends AbstractRequest<ListSmsEventResponse> {
 
     public String getUrl() {
         if (!StringUtil.isBlank(eventType)) {
-            throw new RuntimeException("event_type is invalid.");
+            throw new IllegalArgumentException("event_type is invalid.");
         }
 
         StringBuilder sb = new StringBuilder();

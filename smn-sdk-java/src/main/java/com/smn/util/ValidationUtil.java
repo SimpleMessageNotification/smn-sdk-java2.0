@@ -14,6 +14,7 @@ package com.smn.util;
 import com.smn.common.Constants;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -195,13 +196,10 @@ public class ValidationUtil {
     public static boolean validateDisplayName(String displayName) {
         try {
             byte[] b = displayName.getBytes(Constants.DEFAULT_CHARSET);
-            if (b.length > MAX_TOPIC_DISPLAY_NAME) {
-                return false;
-            }
+            return b.length < MAX_TOPIC_DISPLAY_NAME;
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("validate display name error");
         }
-        return true;
     }
 
 
@@ -218,14 +216,10 @@ public class ValidationUtil {
         }
         try {
             byte[] b = content.getBytes(Constants.DEFAULT_CHARSET);
-            if (b.length > MAX_TEMPLATE_MESSAGE_CONTENT_LENGTH) {
-                return false;
-            }
+            return b.length < MAX_TEMPLATE_MESSAGE_CONTENT_LENGTH;
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException("validate template message content error");
         }
-
-        return true;
     }
 
     /**
@@ -240,6 +234,41 @@ public class ValidationUtil {
             return false;
         }
         return PATTERN_TMPLATE_NAME.matcher(templateName).matches();
+    }
+
+    /**
+     * validate message structure message length
+     *
+     * @param structure the structure to validate
+     * @return boolean
+     * if valid return <code>true</code>, else return <code>false</code>
+     */
+    public static boolean validateMessageStructure(Map<String, Object> structure) {
+        if (structure == null || structure.isEmpty()) {
+            return false;
+        }
+
+        try {
+            String content = JsonUtil.getJsonStringByMap(structure);
+            byte[] b = content.getBytes(Constants.DEFAULT_CHARSET);
+            return b.length < MAX_TEMPLATE_MESSAGE_CONTENT_LENGTH;
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("validate template message content error");
+        }
+    }
+
+    /**
+     * validate structure contains default
+     *
+     * @param structure
+     * @return boolean
+     * if valid return <code>true</code>, else return <code>false</code>
+     */
+    public static boolean validateMessageStructureDefault(Map<String, Object> structure) {
+        if (structure == null || structure.isEmpty()) {
+            return false;
+        }
+        return structure.containsKey(Constants.DEFAULT);
     }
 
     /**
