@@ -46,5 +46,8 @@ public class Constants {
 
     public final static String MESSAGE_TEMPLATE = "message_template";
 
+    public final static String TOPICS = "topics";
+
+    public final static String SUBSCRIPTIONS="subscriptions";
 
 }
