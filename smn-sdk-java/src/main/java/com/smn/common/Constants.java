@@ -44,4 +44,7 @@ public class Constants {
     public final static String MESSAGE = "message";
     public final static String CALLBACK_REQUEST = "callback";
 
+    public final static String MESSAGE_TEMPLATE = "message_template";
+
+
 }
