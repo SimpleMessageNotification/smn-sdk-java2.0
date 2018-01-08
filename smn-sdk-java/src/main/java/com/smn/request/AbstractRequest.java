@@ -108,15 +108,6 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
         }
         headerMap.put(key, value);
     }
-
-    public void setProjectId(String projectId) {
-        this.projectId = projectId;
-    }
-
-    public void setSmnConfiguration(SmnConfiguration smnConfiguration) {
-        this.smnConfiguration = smnConfiguration;
-    }
-
     /**
      * parse httpResponse
      *
@@ -137,14 +128,11 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
         }
     }
 
-    public SmnConfiguration getSmnConfiguration() {
-        return smnConfiguration;
-    }
-
-    public String getProjectId() {
-        return projectId;
-    }
-
+    /**
+     * get query string for get method
+     *
+     * @return query string
+     */
     protected String getQueryString() {
         List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
         for (Map.Entry<String, String> entry : queryMap.entrySet()) {
@@ -169,7 +157,46 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
         return param;
     }
 
+    /**
+     * get sms service url endpoint
+     *
+     * @return smn service url
+     */
     protected String getSmnServiceUrl() {
         return Constants.HTTPS + Constants.SMN + "." + smnConfiguration.getRegionName() + "." + Constants.ENDPOINT;
+    }
+
+    /**
+     * get smn configuration
+     *
+     * @return smn configuration
+     */
+    public SmnConfiguration getSmnConfiguration() {
+        return smnConfiguration;
+    }
+
+    /**
+     * set smn configuration
+     * @param smnConfiguration
+     */
+    public void setSmnConfiguration(SmnConfiguration smnConfiguration) {
+        this.smnConfiguration = smnConfiguration;
+    }
+
+    /**
+     * get project id for get method
+     *
+     * @return project id
+     */
+    public String getProjectId() {
+        return projectId;
+    }
+
+    /**
+     * set project id
+     * @param projectId
+     */
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
     }
 }
