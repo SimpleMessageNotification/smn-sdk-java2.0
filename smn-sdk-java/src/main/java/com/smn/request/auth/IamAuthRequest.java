@@ -26,6 +26,9 @@ import com.smn.response.auth.IamAuthResponse;
  */
 public class IamAuthRequest extends AbstractRequest<IamAuthResponse> {
 
+    /**
+     * smn configuration
+     */
     private SmnConfiguration smnConfiguration;
 
     public HttpMethod getHttpMethod() {

@@ -42,12 +42,12 @@ public class ClientConfiguration {
     /**
      * connect time out ,in millisecond
      */
-    private int connectTimeOut = 10000;
+    private int connectTimeOut = 60000;
 
     /**
      * read time out,in millisecond
      */
-    private int socketTimeOut = 10000;
+    private int socketTimeOut = 60000;
 
     /**
      * ignore certificate verification

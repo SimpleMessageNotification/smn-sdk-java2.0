@@ -40,26 +40,50 @@ public class HttpResponse {
     private Map<String, String> headers;
 
 
+    /**
+     * @return the httpcode
+     */
     public int getHttpCode() {
         return httpCode;
     }
 
+    /**
+     * set httpcode
+     *
+     * @param httpCode
+     */
     public void setHttpCode(int httpCode) {
         this.httpCode = httpCode;
     }
 
+    /**
+     * @return http response conent
+     */
     public String getContent() {
         return content;
     }
 
+    /**
+     * set http conent
+     *
+     * @param content
+     */
     public void setContent(String content) {
         this.content = content;
     }
 
+    /**
+     * @return headers
+     */
     public Map<String, String> getHeaders() {
         return headers;
     }
 
+    /**
+     * set http response headers
+     *
+     * @param headers
+     */
     public void setHeaders(Header[] headers) {
         this.headers = new HashMap<String, String>();
         for (Header header : headers) {
@@ -69,10 +93,10 @@ public class HttpResponse {
 
     /**
      * Judge whether the request is successful or not
+     *
      * @return if success return true, else return false
      */
-    public boolean isSuccess()
-    {
-        return  200 <= httpCode && httpCode < 300;
+    public boolean isSuccess() {
+        return 200 <= httpCode && httpCode < 300;
     }
 }
