@@ -39,6 +39,12 @@ public class SubscriptionDemo {
                 "YourAccountDomainName",
                 "YourRegionName");
 
+        // use aksk authentication
+//        SmnClient smnClient = new AkskSmnClient(
+//                "YourAccessKeyId",
+//                "YourSecretAccessKey",
+//                "YourRegionName"
+
         //subscribe
         subscribe(smnClient);
 

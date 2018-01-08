@@ -42,6 +42,13 @@ public class MessageTemplateDemo {
                 "YourAccountDomainName",
                 "YourRegionName");
 
+        // use aksk authentication
+//        SmnClient smnClient = new AkskSmnClient(
+//                "YourAccessKeyId",
+//                "YourSecretAccessKey",
+//                "YourRegionName"
+//        );
+
         // create message template
         createMessageTemplate(smnClient);
 

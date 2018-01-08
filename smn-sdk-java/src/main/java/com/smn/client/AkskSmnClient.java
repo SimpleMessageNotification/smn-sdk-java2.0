@@ -90,7 +90,6 @@ public class AkskSmnClient implements SmnClient {
         request.setSmnConfiguration(this.smnConfiguration);
         String projectId = iamAuth.getProjectId();
         addHeader(request, projectId);
-        request.setProjectId(projectId);
         HttpResponse httpResponse = httpTool.getHttpResponse(request);
         return request.getResponse(httpResponse);
     }
@@ -104,6 +103,9 @@ public class AkskSmnClient implements SmnClient {
         if (StringUtil.isEmpty(projectId)) {
             throw new NullPointerException("project id is null");
         }
+        // 设置project id
+        request.setProjectId(projectId);
+
         request.addHeader("region", smnConfiguration.getRegionName());
         request.addHeader("X-Project-Id", projectId);
         request.addHeader("X-Smn-sdk", VersionUtil.getSdkVersion());

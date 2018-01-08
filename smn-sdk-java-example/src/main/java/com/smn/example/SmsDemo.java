@@ -11,6 +11,7 @@
  */
 package com.smn.example;
 
+import com.smn.client.AkskSmnClient;
 import com.smn.client.DefaultSmnClient;
 import com.smn.client.SmnClient;
 import com.smn.common.SmsCallbackEventType;
@@ -49,6 +50,13 @@ public class SmsDemo {
                 "YourAccountDomainName",
                 "YourRegionName");
 
+        // use aksk authentication
+//        SmnClient smnClient = new AkskSmnClient(
+//                "YourAccessKeyId",
+//                "YourSecretAccessKey",
+//                "YourRegionName"
+//        );
+
         // 发送短信，send sms
         smsPublish(smnClient);
 
@@ -80,7 +88,7 @@ public class SmsDemo {
         SmsPublishRequest smnRequest = new SmsPublishRequest();
 
         // 设置参数
-        smnRequest.setEndpoint("+861368***587")
+        smnRequest.setEndpoint("+8613688807587")
                 .setMessage("您的验证码是:1234，请查收")
                 .setSignId("6be340e91e5241e4b5d85837e6709104");
 

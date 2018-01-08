@@ -49,6 +49,13 @@ public class TopicDemo {
                 "YourAccountDomainName",
                 "YourRegionName");
 
+        // use aksk authentication
+//        SmnClient smnClient = new AkskSmnClient(
+//                "YourAccessKeyId",
+//                "YourSecretAccessKey",
+//                "YourRegionName"
+//        );
+
         // create topic
         createTopic(smnClient);
 

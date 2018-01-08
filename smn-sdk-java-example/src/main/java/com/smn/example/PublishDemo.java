@@ -35,6 +35,13 @@ public class PublishDemo {
                 "YourAccountDomainName",
                 "YourRegionName");
 
+        // use aksk authentication
+//        SmnClient smnClient = new AkskSmnClient(
+//                "YourAccessKeyId",
+//                "YourSecretAccessKey",
+//                "YourRegionName"
+//        );
+
         // publish with text message
         publishWithMessage(smnClient);
 

@@ -23,17 +23,9 @@ import com.smn.util.StringUtil;
 import com.smn.util.VersionUtil;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-import static com.smn.common.Constants.EXPIRES_AT;
-import static com.smn.common.Constants.ID;
-import static com.smn.common.Constants.PROJECT;
-import static com.smn.common.Constants.TOKEN;
-import static com.smn.common.Constants.X_SUBJECT_TOKEN;
+import static com.smn.common.Constants.*;
 
 /**
  * auth and cache token and project
@@ -47,11 +39,34 @@ public class IamAuth {
      */
     private long expiredInterval = 30 * 60 * 1000;
 
+    /**
+     * smn configuration
+     */
     private SmnConfiguration smnConfiguration;
+
+    /**
+     * http client
+     */
     private HttpTool httpTool;
+
+    /**
+     * user project id
+     */
     private String projectId;
+
+    /**
+     * user token
+     */
     private String authToken;
+
+    /**
+     * token expire time
+     */
     private long expiresTime;
+
+    /**
+     * aksk signer
+     */
     private AkskSigner signer;
 
     /**
@@ -165,7 +180,8 @@ public class IamAuth {
                 }
                 this.projectId = (String) ((HashMap) (projectList).get(0)).get("id");
             } else {
-                throw new RuntimeException("Fail to get project id by aksk auth. http response status: " + response.getHttpCode());
+                throw new RuntimeException("Fail to get project id by aksk auth. http response status: " + response.getHttpCode()
+                        + ", errorMessage: " + responseMessage);
             }
 
             if (StringUtil.isEmpty(this.projectId)) {
