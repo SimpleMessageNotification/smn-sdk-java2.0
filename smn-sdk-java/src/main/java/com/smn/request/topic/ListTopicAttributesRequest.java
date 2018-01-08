@@ -34,10 +34,12 @@ public class ListTopicAttributesRequest extends AbstractRequest<ListTopicAttribu
      */
     private String name;
 
+    @Override
     public HttpMethod getHttpMethod() {
         return HttpMethod.GET;
     }
 
+    @Override
     public String getUrl() {
         if (StringUtil.isEmpty(topicUrn)) {
             throw new NullPointerException("topic urn is null");

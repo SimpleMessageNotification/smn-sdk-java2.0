@@ -29,10 +29,12 @@ public class DeleteTopicRequest extends AbstractRequest<DeleteTopicResponse> {
      */
     private String topicUrn;
 
+    @Override
     public HttpMethod getHttpMethod() {
         return HttpMethod.DELETE;
     }
 
+    @Override
     public String getUrl() {
         if (StringUtil.isEmpty(topicUrn))
         {

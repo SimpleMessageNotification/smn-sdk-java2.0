@@ -39,10 +39,12 @@ public class UpdateTopicAttributeRequest extends AbstractRequest<UpdateTopicAttr
      */
     private String value;
 
+    @Override
     public HttpMethod getHttpMethod() {
         return HttpMethod.PUT;
     }
 
+    @Override
     public String getUrl() {
         if (StringUtil.isEmpty(topicUrn)) {
             throw new NullPointerException("topic urn is null");

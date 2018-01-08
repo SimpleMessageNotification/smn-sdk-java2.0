@@ -28,10 +28,12 @@ public class ListTopicsRequest extends AbstractRequest<ListTopicsResponse> {
      */
     private int limit = 100;
 
+    @Override
     public HttpMethod getHttpMethod() {
         return HttpMethod.GET;
     }
 
+    @Override
     public String getUrl() {
         if (!ValidationUtil.validateOffset(offset)) {
             throw new IllegalArgumentException("offset is invalid.");

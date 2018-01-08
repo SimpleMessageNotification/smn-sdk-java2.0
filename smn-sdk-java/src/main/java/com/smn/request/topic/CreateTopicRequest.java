@@ -35,10 +35,12 @@ public class CreateTopicRequest extends AbstractRequest<CreateTopicResponse> {
      */
     private String displayName;
 
+    @Override
     public HttpMethod getHttpMethod() {
         return HttpMethod.POST;
     }
 
+    @Override
     public String getUrl() {
         if (!ValidationUtil.validateTopicName(name))
         {

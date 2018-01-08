@@ -34,10 +34,12 @@ public class DeleteTopicAttributeByNameRequest extends AbstractRequest<DeleteTop
      */
     private String topicUrn;
 
+    @Override
     public HttpMethod getHttpMethod() {
         return HttpMethod.DELETE;
     }
 
+    @Override
     public String getUrl() {
         if (StringUtil.isEmpty(topicUrn)) {
             throw new NullPointerException("topic urn is null");

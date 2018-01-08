@@ -35,11 +35,12 @@ public class UpdateTopicRequest extends AbstractRequest<UpdateTopicResponse> {
      */
     private String displayName;
 
-
+    @Override
     public HttpMethod getHttpMethod() {
         return HttpMethod.PUT;
     }
 
+    @Override
     public String getUrl() {
         if (StringUtil.isEmpty(topicUrn)) {
             throw new NullPointerException("topic urn is null");
