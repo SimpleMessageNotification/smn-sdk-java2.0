@@ -60,11 +60,14 @@ import java.util.Map;
  * @version 2.0.0
  */
 public class HttpTool {
-
     private static final int DEFAULT_MAX_CONNECTIONS = 4000;
     private static final int DEFAULT_MAX_CONNECTIONS_PER_ROUTE = 4000;
     private static final int DEFAULT_CONNECT_TIMEOUT = 60000;
     private static final int DEFAULT_SOCKET_TIMEOUT = 60000;
+
+    // protocol order map
+    private static final HashMap<String, String> PROTOCOL_MAP = new HashMap<String, String>();
+
     /**
      * http client configuration
      */
@@ -77,6 +80,10 @@ public class HttpTool {
      */
     public HttpTool(ClientConfiguration clientConfiguration) {
         this.clientConfiguration = clientConfiguration;
+
+        // 循环校验http协议是否支持，依次顺序是TLSv1.2->TLSv1.1->TLSv1.0->TLS,映射关系
+        PROTOCOL_MAP.put("TLSv1.2", "TLSv1.1");
+        PROTOCOL_MAP.put("TLSv1.1", "TLSv1.0");
     }
 
     /**
@@ -263,11 +270,6 @@ public class HttpTool {
 
     private SSLConnectionSocketFactory createSslConnectionSocketFactory()
             throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, CertificateException, IOException {
-        // 循环校验http协议是否支持，依次顺序是TLSv1.2->TLSv1.1->TLSv1.0->TLS,映射关系
-        Map<String, String> protocolMap = new HashMap<String, String>();
-        protocolMap.put("TLSv1.2", "TLSv1.1");
-        protocolMap.put("TLSv1.1", "TLSv1.0");
-        protocolMap.put("TLSv1.0", "TLS");
 
         // default
         SSLContext sslContext = null;
@@ -275,9 +277,9 @@ public class HttpTool {
         // is ignore certificate verification
         if (!clientConfiguration.isIgnoreCertificate()) {
             sslContext = createSSLContext(clientConfiguration.getKeyStorePath(), clientConfiguration.getKeyStorePass(),
-                    new TrustSelfSignedStrategy(), protocolMap, "TLSv1.2");
+                    new TrustSelfSignedStrategy(), "TLSv1.2");
         } else {
-            sslContext = buildContextIgnoreCertificate(protocolMap);
+            sslContext = buildContextIgnoreCertificate();
 
         }
 
@@ -292,9 +294,9 @@ public class HttpTool {
      * @throws NoSuchAlgorithmException
      * @throws KeyManagementException
      */
-    private SSLContext buildContextIgnoreCertificate(Map<String, String> protocolMap) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, CertificateException, IOException {
+    private SSLContext buildContextIgnoreCertificate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, CertificateException, IOException {
         SSLContext sslContext = createSSLContext(null, null,
-                new TrustSelfSignedStrategy(), protocolMap, "TLSv1.2");
+                new TrustSelfSignedStrategy(), "TLSv1.2");
 
         X509TrustManager tm = new X509TrustManager() {
             public void checkClientTrusted(X509Certificate[] chain,
@@ -323,7 +325,6 @@ public class HttpTool {
      * @param keyStorePath key store path
      * @param keyStorePass key store pass
      * @param strategy     stategy
-     * @param protocolMap  Protocol order map
      * @param protocol     current protocol to check
      * @return SSLContext
      * @throws KeyStoreException
@@ -332,9 +333,8 @@ public class HttpTool {
      * @throws CertificateException
      * @throws IOException
      */
-    private static SSLContext createSSLContext(String keyStorePath, String keyStorePass,
-                                               TrustStrategy strategy, Map<String, String> protocolMap,
-                                               String protocol)
+    private SSLContext createSSLContext(String keyStorePath, String keyStorePass,
+                                        TrustStrategy strategy, String protocol)
             throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException, CertificateException, IOException {
         SSLContextBuilder builder = new SSLContextBuilder().useProtocol(protocol);
 
@@ -350,10 +350,10 @@ public class HttpTool {
 
             return builder.build();
         } catch (NoSuchAlgorithmException e) {
-            if (protocolMap.get(protocol) != null) {
+            if (PROTOCOL_MAP.get(protocol) != null) {
                 // 继续重试下一个协议是否支持.
                 // Continue to retry the next protocol to support.
-                createSSLContext(keyStorePath, keyStorePass, strategy, protocolMap, protocolMap.get(protocol));
+                createSSLContext(keyStorePath, keyStorePass, strategy, PROTOCOL_MAP.get(protocol));
             } else {
                 // 如果所有的协议都重试了，则抛出异常.
                 // If all the protocols are retried, the exception is thrown.
