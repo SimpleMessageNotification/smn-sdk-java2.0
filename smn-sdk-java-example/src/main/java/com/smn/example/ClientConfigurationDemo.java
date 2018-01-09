@@ -12,7 +12,7 @@
 
 package com.smn.example;
 
-import com.smn.client.AkskSmnClient;
+import com.smn.client.DefaultSmnClient;
 import com.smn.client.SmnClient;
 import com.smn.config.ClientConfiguration;
 import com.smn.request.sms.SmsPublishRequest;
@@ -55,18 +55,19 @@ public class ClientConfigurationDemo {
         clientConfiguration.setMaxRetryNum(3);
 
         // 初始化
-//        SmnClient smnClient = new DefaultSmnClient(
-//                "YourAccountUserName",
-//                "YourAccountPassword",
-//                "YourAccountDomainName",
-//                "YourRegionName");
-
-        // use aksk authentication
-        SmnClient smnClient = new AkskSmnClient(
-                "YourAccessKeyId",
-                "YourSecretAccessKey",
+        SmnClient smnClient = new DefaultSmnClient(
+                "YourAccountUserName",
+                "YourAccountPassword",
+                "YourAccountDomainName",
                 "YourRegionName",
                 clientConfiguration);
+
+        // use aksk authentication
+//        SmnClient smnClient = new AkskSmnClient(
+//                "YourAccessKeyId",
+//                "YourSecretAccessKey",
+//                "YourRegionName",
+//                clientConfiguration);
 
         // 发送短信，send sms
         smsPublish(smnClient);
