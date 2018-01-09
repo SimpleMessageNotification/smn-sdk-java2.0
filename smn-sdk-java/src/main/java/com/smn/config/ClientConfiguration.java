@@ -18,7 +18,44 @@ package com.smn.config;
  * @version 0.9
  */
 public class ClientConfiguration {
+    /**
+     * connect time out ,in millisecond
+     */
+    private int connectTimeOut = 60000;
 
+    /**
+     * read time out,in millisecond
+     */
+    private int socketTimeOut = 60000;
+
+    /**
+     * ignore certificate verification
+     */
+    private boolean ignoreCertificate = false;
+
+    /**
+     * Key library path
+     */
+    private String keyStorePath;
+
+    /**
+     * Key library cipher
+     */
+    private String keyStorePass;
+
+    /**
+     * 最大HTTP连接数。
+     * <p>
+     * The maximum number of HTTP connections.
+     */
+    private int maxConnections = 4000;
+
+    /**
+     * 每个路由默认最大HTTP连接数
+     * <p>
+     * The default maximum HTTP connection number for each route
+     */
+    private int maxConnectionsPerRoute = 4000;
     /**
      * proxy host
      */
@@ -40,19 +77,35 @@ public class ClientConfiguration {
     private String proxyPassword;
 
     /**
-     * connect time out ,in millisecond
+     * proxy domain
      */
-    private int connectTimeOut = 60000;
+    private String proxyDomain;
 
     /**
-     * read time out,in millisecond
+     * proxy workstatiion
      */
-    private int socketTimeOut = 60000;
+    private String proxyWorkstation;
 
     /**
-     * ignore certificate verification
+     * @return the connect timeout
      */
-    private boolean ignoreCertificate = false;
+    public int getConnectTimeOut() {
+        return connectTimeOut;
+    }
+
+    /**
+     * @param connectTimeOut the connection timeout to set
+     */
+    public void setConnectTimeOut(int connectTimeOut) {
+        this.connectTimeOut = connectTimeOut;
+    }
+
+    /**
+     * @return the socket timeout
+     */
+    public int getSocketTimeOut() {
+        return socketTimeOut;
+    }
 
     /**
      * @return the proxy host
@@ -111,24 +164,31 @@ public class ClientConfiguration {
     }
 
     /**
-     * @return the connect timeout
+     * @return the proxy domain
      */
-    public int getConnectTimeOut() {
-        return connectTimeOut;
+    public String getProxyDomain() {
+        return proxyDomain;
     }
 
     /**
-     * @param connectTimeOut the connection timeout to set
+     * @param proxyDomain the proxy domain to set
      */
-    public void setConnectTimeOut(int connectTimeOut) {
-        this.connectTimeOut = connectTimeOut;
+    public void setProxyDomain(String proxyDomain) {
+        this.proxyDomain = proxyDomain;
     }
 
     /**
-     * @return the socket timeout
+     * @return the proxy workstation
      */
-    public int getSocketTimeOut() {
-        return socketTimeOut;
+    public String getProxyWorkstation() {
+        return proxyWorkstation;
+    }
+
+    /**
+     * @param proxyWorkstation the proxy workstation to set
+     */
+    public void setProxyWorkstation(String proxyWorkstation) {
+        this.proxyWorkstation = proxyWorkstation;
     }
 
     /**
@@ -150,5 +210,61 @@ public class ClientConfiguration {
      */
     public void setIgnoreCertificate(boolean ignoreCertificate) {
         this.ignoreCertificate = ignoreCertificate;
+    }
+
+    /**
+     * @return Key library path
+     */
+    public String getKeyStorePath() {
+        return keyStorePath;
+    }
+
+    /**
+     * @param keyStorePath Key library path
+     */
+    public void setKeyStorePath(String keyStorePath) {
+        this.keyStorePath = keyStorePath;
+    }
+
+    /**
+     * @return Key library cipher
+     */
+    public String getKeyStorePass() {
+        return keyStorePass;
+    }
+
+    /**
+     * @param keyStorePass Key library cipher
+     */
+    public void setKeyStorePass(String keyStorePass) {
+        this.keyStorePass = keyStorePass;
+    }
+
+    /**
+     * @return The maximum number of HTTP connections.
+     */
+    public int getMaxConnections() {
+        return maxConnections;
+    }
+
+    /**
+     * @param maxConnections The maximum number of HTTP connections.
+     */
+    public void setMaxConnections(int maxConnections) {
+        this.maxConnections = maxConnections;
+    }
+
+    /**
+     * @return The default maximum HTTP connection number for each route
+     */
+    public int getMaxConnectionsPerRoute() {
+        return maxConnectionsPerRoute;
+    }
+
+    /**
+     * @param maxConnectionsPerRoute The default maximum HTTP connection number for each route
+     */
+    public void setMaxConnectionsPerRoute(int maxConnectionsPerRoute) {
+        this.maxConnectionsPerRoute = maxConnectionsPerRoute;
     }
 }
