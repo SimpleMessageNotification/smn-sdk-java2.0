@@ -21,6 +21,12 @@ import com.smn.request.AbstractRequest;
 import com.smn.request.IHttpRequest;
 import com.smn.response.AbstractResponse;
 
+/**
+ * abstract smn client
+ *
+ * @author zhangyx
+ * @version 2.0.2
+ */
 public abstract class AbstractSmnClient implements SmnClient {
 
     /**
