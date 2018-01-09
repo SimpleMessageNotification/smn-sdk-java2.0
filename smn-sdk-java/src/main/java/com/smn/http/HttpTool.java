@@ -29,6 +29,7 @@ import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -36,7 +37,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContexts;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.SSLContext;
@@ -49,6 +50,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -227,67 +229,138 @@ public class HttpTool {
 
             httpClientBuilder.setProxy(proxy);
 
-            String proxyUsername = clientConfiguration.getProxyUserName();
-            String proxyPassword = clientConfiguration.getProxyPassword();
+            // add proxy credentials
+            addProxyCredentials(httpClientBuilder, proxy);
+        }
+    }
 
-            if (proxyUsername != null && proxyPassword != null) {
-                String proxyDomain = clientConfiguration.getProxyDomain();
-                String proxyWorkstation = clientConfiguration.getProxyWorkstation();
+    /**
+     * add proxy credentials
+     *
+     * @param httpClientBuilder http client builder
+     * @param proxy             http proxy
+     */
+    private void addProxyCredentials(HttpClientBuilder httpClientBuilder, HttpHost proxy) {
+        String proxyUsername = clientConfiguration.getProxyUserName();
+        String proxyPassword = clientConfiguration.getProxyPassword();
 
-                CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        if (proxyUsername != null && proxyPassword != null) {
+            String proxyDomain = clientConfiguration.getProxyDomain();
+            String proxyWorkstation = clientConfiguration.getProxyWorkstation();
 
-                credentialsProvider.setCredentials(new AuthScope(proxy),
-                        new NTCredentials(proxyUsername, proxyPassword,
-                                proxyWorkstation, proxyDomain)
-                );
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
 
-                httpClientBuilder
-                        .setDefaultCredentialsProvider(credentialsProvider);
+            credentialsProvider.setCredentials(new AuthScope(proxy),
+                    new NTCredentials(proxyUsername, proxyPassword,
+                            proxyWorkstation, proxyDomain)
+            );
 
-            }
+            httpClientBuilder
+                    .setDefaultCredentialsProvider(credentialsProvider);
+
         }
     }
 
     private SSLConnectionSocketFactory createSslConnectionSocketFactory()
             throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, CertificateException, IOException {
+        // 循环校验http协议是否支持，依次顺序是TLSv1.2->TLSv1.1->TLSv1.0->TLS,映射关系
+        Map<String, String> protocolMap = new HashMap<String, String>();
+        protocolMap.put("TLSv1.2", "TLSv1.1");
+        protocolMap.put("TLSv1.1", "TLSv1.0");
+        protocolMap.put("TLSv1.0", "TLS");
+
         // default
-        SSLContext sslContext = SSLContexts.custom()
-                .loadTrustMaterial(null, new TrustSelfSignedStrategy())
-                .build();
+        SSLContext sslContext = null;
 
         // is ignore certificate verification
-        if (clientConfiguration.isIgnoreCertificate()) {
-            X509TrustManager tm = new X509TrustManager() {
-                public void checkClientTrusted(X509Certificate[] chain,
-                                               String authType) throws CertificateException {
-                }
-
-                public void checkServerTrusted(X509Certificate[] chain,
-                                               String authType) throws CertificateException {
-                }
-
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-            };
-            sslContext.init(null, new TrustManager[]{tm}, null);
-
+        if (!clientConfiguration.isIgnoreCertificate()) {
+            sslContext = createSSLContext(clientConfiguration.getKeyStorePath(), clientConfiguration.getKeyStorePass(),
+                    new TrustSelfSignedStrategy(), protocolMap, "TLSv1.2");
         } else {
-            if (!StringUtil.isBlank(clientConfiguration.getKeyStorePath()) &&
-                    !StringUtil.isBlank(clientConfiguration.getKeyStorePass())) {
-                sslContext = SSLContexts
-                        .custom()
-                        .loadTrustMaterial(
-                                new File(clientConfiguration.getKeyStorePath()),
-                                clientConfiguration.getKeyStorePass().toCharArray(),
-                                new TrustSelfSignedStrategy())
-                        .build();
+            sslContext = buildContextIgnoreCertificate(protocolMap);
+
+        }
+
+        return new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+    }
+
+    /**
+     * build SSLContext with all trust
+     *
+     * @return SSLContext
+     * @throws KeyStoreException
+     * @throws NoSuchAlgorithmException
+     * @throws KeyManagementException
+     */
+    private SSLContext buildContextIgnoreCertificate(Map<String, String> protocolMap) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, CertificateException, IOException {
+        SSLContext sslContext = createSSLContext(null, null,
+                new TrustSelfSignedStrategy(), protocolMap, "TLSv1.2");
+
+        X509TrustManager tm = new X509TrustManager() {
+            public void checkClientTrusted(X509Certificate[] chain,
+                                           String authType) throws CertificateException {
+            }
+
+            public void checkServerTrusted(X509Certificate[] chain,
+                                           String authType) throws CertificateException {
+            }
+
+            public X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+        };
+        sslContext.init(null, new TrustManager[]{tm}, null);
+
+        return sslContext;
+    }
+
+    /**
+     * 循环校验http协议是否支持，依次顺序是TLSv1.2->TLSv1.1->TLSv1.0->TLS
+     * <p>
+     * Loop check whether the HTTP protocol is supported
+     * in sequence is TLSv1.2->TLSv1.1->TLSv1.0->TLS
+     *
+     * @param keyStorePath key store path
+     * @param keyStorePass key store pass
+     * @param strategy     stategy
+     * @param protocolMap  Protocol order map
+     * @param protocol     current protocol to check
+     * @return SSLContext
+     * @throws KeyStoreException
+     * @throws KeyManagementException
+     * @throws NoSuchAlgorithmException
+     * @throws CertificateException
+     * @throws IOException
+     */
+    private static SSLContext createSSLContext(String keyStorePath, String keyStorePass,
+                                               TrustStrategy strategy, Map<String, String> protocolMap,
+                                               String protocol)
+            throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException, CertificateException, IOException {
+        SSLContextBuilder builder = new SSLContextBuilder().useProtocol(protocol);
+
+        try {
+            if (!StringUtil.isBlank(keyStorePath) && !StringUtil.isBlank(keyStorePass)) {
+                builder.loadTrustMaterial(
+                        new File(keyStorePath),
+                        keyStorePass.toCharArray(),
+                        strategy);
+            } else {
+                builder.loadTrustMaterial(null, strategy);
+            }
+
+            return builder.build();
+        } catch (NoSuchAlgorithmException e) {
+            if (protocolMap.get(protocol) != null) {
+                // 继续重试下一个协议是否支持.
+                // Continue to retry the next protocol to support.
+                createSSLContext(keyStorePath, keyStorePass, strategy, protocolMap, protocolMap.get(protocol));
+            } else {
+                // 如果所有的协议都重试了，则抛出异常.
+                // If all the protocols are retried, the exception is thrown.
+                throw e;
             }
         }
-        return new SSLConnectionSocketFactory(sslContext,
-                new String[]{"TLSv1.1", "TLSv1.2"},
-                null,
-                new NoopHostnameVerifier());
+        return builder.build();
     }
 
     /**

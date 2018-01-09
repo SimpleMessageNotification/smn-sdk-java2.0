@@ -16,11 +16,8 @@ import com.smn.common.Constants;
 import com.smn.config.ClientConfiguration;
 import com.smn.config.SmnConfiguration;
 import com.smn.http.HttpMethod;
-import com.smn.http.HttpResponse;
 import com.smn.http.HttpTool;
-import com.smn.request.AbstractRequest;
 import com.smn.request.IHttpRequest;
-import com.smn.response.AbstractResponse;
 import com.smn.signer.AkskSigner;
 import com.smn.util.StringUtil;
 import com.smn.util.VersionUtil;
@@ -33,26 +30,11 @@ import java.net.URL;
  * @author zhangyx
  * @version 2.0.0
  */
-public class AkskSmnClient implements SmnClient {
-    /**
-     * smn configuration
-     */
-    private SmnConfiguration smnConfiguration;
-
-    /**
-     * http tool
-     */
-    private HttpTool httpTool;
-
+public class AkskSmnClient extends AbstractSmnClient {
     /**
      * signer tool
      */
     private AkskSigner signer;
-
-    /**
-     * auth tool
-     */
-    private IamAuth iamAuth;
 
     /**
      * constructor for aksk authentication
@@ -79,6 +61,9 @@ public class AkskSmnClient implements SmnClient {
         if (clientConfiguration == null) {
             clientConfiguration = new ClientConfiguration();
         }
+
+        this.clientConfiguration = clientConfiguration;
+
         this.httpTool = new HttpTool(clientConfiguration);
 
         this.signer = new AkskSigner(smnConfiguration, Constants.SMN_SERVICE_NAME);
@@ -86,25 +71,22 @@ public class AkskSmnClient implements SmnClient {
         this.iamAuth = new IamAuth(smnConfiguration, httpTool, signer);
     }
 
-    public <T extends AbstractResponse> T sendRequest(AbstractRequest<T> request) {
-        request.setSmnConfiguration(this.smnConfiguration);
-        String projectId = iamAuth.getProjectId();
-        addHeader(request, projectId);
-        HttpResponse httpResponse = httpTool.getHttpResponse(request);
-        return request.getResponse(httpResponse);
-    }
-
     /**
-     * add header for aksk
+     * (non-doc)
      *
-     * @param request request message
+     * @param request
+     * @see AbstractSmnClient#addRequestParamAndHeader(IHttpRequest)
      */
-    private void addHeader(IHttpRequest request, String projectId) {
+    @Override
+    public void addRequestParamAndHeader(IHttpRequest request) {
+
+        String projectId = iamAuth.getProjectId();
         if (StringUtil.isEmpty(projectId)) {
             throw new NullPointerException("project id is null");
         }
         // 设置project id
         request.setProjectId(projectId);
+        request.setRegionName(this.smnConfiguration.getRegionName());
 
         request.addHeader("region", smnConfiguration.getRegionName());
         request.addHeader("X-Project-Id", projectId);
@@ -129,5 +111,14 @@ public class AkskSmnClient implements SmnClient {
         } catch (Exception e) {
             throw new RuntimeException("Failed to sign for aksk.");
         }
+    }
+
+    /**
+     * add header for aksk
+     *
+     * @param request request message
+     */
+    private void addHeader(IHttpRequest request, String projectId) {
+
     }
 }

@@ -18,6 +18,17 @@ package com.smn.config;
  * @version 0.9
  */
 public class ClientConfiguration {
+
+    /**
+     * is auto failure retry
+     */
+    protected boolean autoFailRetry = false;
+
+    /**
+     * the max retry num
+     */
+    protected int maxRetryNum;
+
     /**
      * connect time out ,in millisecond
      */
@@ -85,6 +96,34 @@ public class ClientConfiguration {
      * proxy workstatiion
      */
     private String proxyWorkstation;
+
+    /**
+     * @return isAutoFailRetry
+     */
+    public boolean isAutoFailRetry() {
+        return autoFailRetry;
+    }
+
+    /**
+     * @param autoFailRetry the autoFailRetry to set
+     */
+    public void setAutoFailRetry(boolean autoFailRetry) {
+        this.autoFailRetry = autoFailRetry;
+    }
+
+    /**
+     * @return maxRetryNum
+     */
+    public int getMaxRetryNum() {
+        return maxRetryNum;
+    }
+
+    /**
+     * @param maxRetryNum the maxRetryNum to set
+     */
+    public void setMaxRetryNum(int maxRetryNum) {
+        this.maxRetryNum = maxRetryNum;
+    }
 
     /**
      * @return the connect timeout

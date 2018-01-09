@@ -29,21 +29,7 @@ import com.smn.util.VersionUtil;
  * @author zhangyx
  * @version 2.0.0
  */
-public class DefaultSmnClient implements SmnClient {
-    /**
-     * smn configuration
-     */
-    private SmnConfiguration smnConfiguration;
-
-    /**
-     * http tool
-     */
-    private HttpTool httpTool;
-
-    /**
-     * auth tool
-     */
-    private IamAuth iamAuth;
+public class DefaultSmnClient extends AbstractSmnClient {
 
     /**
      * constructor for token authentication
@@ -72,6 +58,9 @@ public class DefaultSmnClient implements SmnClient {
         if (clientConfiguration == null) {
             clientConfiguration = new ClientConfiguration();
         }
+
+        this.clientConfiguration = clientConfiguration;
+
         this.httpTool = new HttpTool(clientConfiguration);
 
         this.iamAuth = new IamAuth(smnConfiguration, httpTool);
@@ -80,25 +69,22 @@ public class DefaultSmnClient implements SmnClient {
     /**
      * (non-doc)
      *
-     * @see SmnClient#sendRequest(AbstractRequest)
+     * @param request
+     * @see AbstractSmnClient#addRequestParamAndHeader(IHttpRequest)
      */
-    public <T extends AbstractResponse> T sendRequest(AbstractRequest<T> request) {
+    @Override
+    public void addRequestParamAndHeader(IHttpRequest request) {
         String[] arrays = this.iamAuth.getTokenAndProjectId();
-        request.setSmnConfiguration(this.smnConfiguration);
-        addHeader(request, arrays[1], arrays[0]);
-        request.setProjectId(arrays[0]);
-        HttpResponse httpResponse = httpTool.getHttpResponse(request);
-
-        return request.getResponse(httpResponse);
-    }
-
-    private void addHeader(IHttpRequest request, String token, String projectId) {
-        if (StringUtil.isEmpty(projectId)) {
+        if (StringUtil.isEmpty(arrays[0])) {
             throw new NullPointerException("project id is null");
         }
+
+        request.setProjectId(arrays[0]);
+        request.setRegionName(this.smnConfiguration.getRegionName());
+
         request.addHeader("region", smnConfiguration.getRegionName());
-        request.addHeader("X-Auth-Token", token);
-        request.addHeader("X-Project-Id", projectId);
+        request.addHeader("X-Auth-Token", arrays[1]);
+        request.addHeader("X-Project-Id", arrays[0]);
         request.addHeader("X-Smn-sdk", VersionUtil.getSdkVersion());
         request.addHeader("Content-Type", Constants.DEFAULT_CONTENT_TYPE);
     }

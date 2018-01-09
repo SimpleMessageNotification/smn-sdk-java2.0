@@ -45,9 +45,9 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
     private Map<String, String> headerMap;
 
     /**
-     * smn configuration
+     * region name
      */
-    private SmnConfiguration smnConfiguration;
+    protected String regionName;
 
     /**
      * body parameters
@@ -163,24 +163,7 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
      * @return smn service url
      */
     protected String getSmnServiceUrl() {
-        return Constants.HTTPS + Constants.SMN + "." + smnConfiguration.getRegionName() + "." + Constants.ENDPOINT;
-    }
-
-    /**
-     * get smn configuration
-     *
-     * @return smn configuration
-     */
-    public SmnConfiguration getSmnConfiguration() {
-        return smnConfiguration;
-    }
-
-    /**
-     * set smn configuration
-     * @param smnConfiguration
-     */
-    public void setSmnConfiguration(SmnConfiguration smnConfiguration) {
-        this.smnConfiguration = smnConfiguration;
+        return Constants.HTTPS + Constants.SMN + "." + regionName + "." + Constants.ENDPOINT;
     }
 
     /**
@@ -198,5 +181,19 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
      */
     public void setProjectId(String projectId) {
         this.projectId = projectId;
+    }
+
+    /**
+     * @return region name
+     */
+    public String getRegionName() {
+        return regionName;
+    }
+
+    /**
+     * @param regionName
+     */
+    public void setRegionName(String regionName) {
+        this.regionName = regionName;
     }
 }
