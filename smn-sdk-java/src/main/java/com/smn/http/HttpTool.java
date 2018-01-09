@@ -18,17 +18,14 @@ import com.smn.util.VersionUtil;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.auth.NTCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpDelete;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.*;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -38,12 +35,14 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.File;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -60,6 +59,10 @@ import java.util.Map;
  */
 public class HttpTool {
 
+    private static final int DEFAULT_MAX_CONNECTIONS = 4000;
+    private static final int DEFAULT_MAX_CONNECTIONS_PER_ROUTE = 4000;
+    private static final int DEFAULT_CONNECT_TIMEOUT = 60000;
+    private static final int DEFAULT_SOCKET_TIMEOUT = 60000;
     /**
      * http client configuration
      */
@@ -85,7 +88,9 @@ public class HttpTool {
         CloseableHttpClient httpclient = null;
         CloseableHttpResponse response = null;
         try {
+
             httpclient = getHttpClient();
+
             HttpRequestBase httpRequestBase = createHttpRequest(httpRequest);
             response = httpclient.execute(httpRequestBase);
 
@@ -97,7 +102,16 @@ public class HttpTool {
             httpResponse.setContent(responseMessage);
             httpResponse.setHeaders(response.getAllHeaders());
             return httpResponse;
-        } catch (Exception e) {
+
+        } catch (CertificateException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (KeyStoreException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (KeyManagementException e) {
             throw new RuntimeException(e);
         } finally {
             try {
@@ -168,42 +182,78 @@ public class HttpTool {
      * @return {@code CloseableHttpClient}
      * @throws Exception
      */
-    public CloseableHttpClient getHttpClient() throws Exception {
+    public CloseableHttpClient getHttpClient()
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, KeyManagementException {
         if (clientConfiguration == null) {
             clientConfiguration = new ClientConfiguration();
         }
 
-        SSLConnectionSocketFactory sslSocketFactory = createSslConnectionSocketFactory();
-        HttpClientBuilder builder = HttpClients.custom();
+        // 设置协议http和https对应的处理socket链接工厂的对象
+        Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
+                .<ConnectionSocketFactory>create()
+                .register("http", PlainConnectionSocketFactory.INSTANCE)
+                .register("https", createSslConnectionSocketFactory())
+                .build();
+
+        PoolingHttpClientConnectionManager connManager = new PoolingHttpClientConnectionManager(socketFactoryRegistry);
+        connManager.setMaxTotal(clientConfiguration.getMaxConnections() <= 0
+                ? DEFAULT_MAX_CONNECTIONS
+                : clientConfiguration.getMaxConnections());
+        connManager.setDefaultMaxPerRoute(clientConfiguration.getMaxConnectionsPerRoute() <= 0
+                ? DEFAULT_MAX_CONNECTIONS_PER_ROUTE
+                : clientConfiguration.getMaxConnectionsPerRoute());
+
+        HttpClientBuilder httpClientBuilder = HttpClients.custom().setConnectionManager(connManager);
 
         // set proxy
+        setProxy(httpClientBuilder);
+
+        // set user agent
+        httpClientBuilder.setUserAgent(VersionUtil.getDefaultUserAgent());
+        return httpClientBuilder.build();
+    }
+
+    /**
+     * set http proxy
+     *
+     * @param httpClientBuilder
+     */
+    private void setProxy(HttpClientBuilder httpClientBuilder) {
         String proxyHost = clientConfiguration.getProxyHost();
         int proxyPort = clientConfiguration.getProxyPort();
 
-        if (!StringUtil.isEmpty(proxyHost) && proxyPort > 0) {
+        if (proxyHost != null && proxyPort > 0) {
             HttpHost proxy = new HttpHost(proxyHost, proxyPort);
-            builder.setProxy(proxy);
 
-            String username = clientConfiguration.getProxyUserName();
-            String password = clientConfiguration.getProxyPassword();
+            httpClientBuilder.setProxy(proxy);
 
-            if (!StringUtil.isEmpty(username) && !StringUtil.isEmpty(password)) {
+            String proxyUsername = clientConfiguration.getProxyUserName();
+            String proxyPassword = clientConfiguration.getProxyPassword();
+
+            if (proxyUsername != null && proxyPassword != null) {
+                String proxyDomain = clientConfiguration.getProxyDomain();
+                String proxyWorkstation = clientConfiguration.getProxyWorkstation();
+
                 CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-                AuthScope authscope = new AuthScope(proxy);
-                Credentials credentials = new UsernamePasswordCredentials(username,
-                        password);
-                credentialsProvider.setCredentials(authscope, credentials);
-                builder.setDefaultCredentialsProvider(credentialsProvider);
+
+                credentialsProvider.setCredentials(new AuthScope(proxy),
+                        new NTCredentials(proxyUsername, proxyPassword,
+                                proxyWorkstation, proxyDomain)
+                );
+
+                httpClientBuilder
+                        .setDefaultCredentialsProvider(credentialsProvider);
+
             }
         }
-        builder.setUserAgent(VersionUtil.getDefaultUserAgent());
-        CloseableHttpClient httpclient = builder.setSSLSocketFactory(sslSocketFactory).build();
-        return httpclient;
     }
 
-    private SSLConnectionSocketFactory createSslConnectionSocketFactory() throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException {
-        SSLContext sslContext = SSLContexts.custom().useProtocol("TLSV1.1")
-                .loadTrustMaterial(null, new TrustSelfSignedStrategy()).build();
+    private SSLConnectionSocketFactory createSslConnectionSocketFactory()
+            throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, CertificateException, IOException {
+        // default
+        SSLContext sslContext = SSLContexts.custom()
+                .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+                .build();
 
         // is ignore certificate verification
         if (clientConfiguration.isIgnoreCertificate()) {
@@ -221,8 +271,22 @@ public class HttpTool {
                 }
             };
             sslContext.init(null, new TrustManager[]{tm}, null);
+
+        } else {
+            if (!StringUtil.isBlank(clientConfiguration.getKeyStorePath()) &&
+                    !StringUtil.isBlank(clientConfiguration.getKeyStorePass())) {
+                sslContext = SSLContexts
+                        .custom()
+                        .loadTrustMaterial(
+                                new File(clientConfiguration.getKeyStorePath()),
+                                clientConfiguration.getKeyStorePass().toCharArray(),
+                                new TrustSelfSignedStrategy())
+                        .build();
+            }
         }
         return new SSLConnectionSocketFactory(sslContext,
+                new String[]{"TLSv1.1", "TLSv1.2"},
+                null,
                 new NoopHostnameVerifier());
     }
 
@@ -236,8 +300,10 @@ public class HttpTool {
             clientConfiguration = new ClientConfiguration();
         }
         RequestConfig requestConfig = RequestConfig.custom()
-                .setConnectTimeout(clientConfiguration.getConnectTimeOut())
-                .setSocketTimeout(clientConfiguration.getSocketTimeOut())
+                .setConnectTimeout(clientConfiguration.getConnectTimeOut() <= 0
+                        ? DEFAULT_CONNECT_TIMEOUT : clientConfiguration.getConnectTimeOut())
+                .setSocketTimeout(clientConfiguration.getSocketTimeOut() <= 0
+                        ? DEFAULT_SOCKET_TIMEOUT : clientConfiguration.getSocketTimeOut())
                 .build();
         return requestConfig;
     }
