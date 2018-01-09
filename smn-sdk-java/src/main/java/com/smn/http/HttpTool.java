@@ -285,7 +285,7 @@ public class HttpTool {
             }
         }
         return new SSLConnectionSocketFactory(sslContext,
-                new String[]{"TLSv1.0", "TLSv1.1", "TLSv1.2"},
+                new String[]{"TLSv1.1", "TLSv1.2"},
                 null,
                 new NoopHostnameVerifier());
     }
