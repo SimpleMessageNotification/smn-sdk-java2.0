@@ -49,19 +49,25 @@ public class ClientConfigurationDemo {
         // 设置代理认证密码
         clientConfiguration.setProxyPassword("123456");
 
+        // 设置失败自动重试
+        clientConfiguration.setAutoFailRetry(true);
+        //设置重试次数
+        clientConfiguration.setMaxRetryNum(3);
+
         // 初始化
         SmnClient smnClient = new DefaultSmnClient(
                 "YourAccountUserName",
                 "YourAccountPassword",
                 "YourAccountDomainName",
-                "YourRegionName");
+                "YourRegionName",
+                clientConfiguration);
 
         // use aksk authentication
 //        SmnClient smnClient = new AkskSmnClient(
 //                "YourAccessKeyId",
 //                "YourSecretAccessKey",
 //                "YourRegionName",
-//        clientConfiguration);
+//                clientConfiguration);
 
         // 发送短信，send sms
         smsPublish(smnClient);

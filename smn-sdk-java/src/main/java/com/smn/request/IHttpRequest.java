@@ -65,4 +65,11 @@ public interface IHttpRequest {
      * @param projectId
      */
     void setProjectId(String projectId);
+
+    /**
+     * set region name
+     *
+     * @param regionName
+     */
+    void setRegionName(String regionName);
 }
