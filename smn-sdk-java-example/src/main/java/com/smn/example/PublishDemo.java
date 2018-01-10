@@ -46,10 +46,10 @@ public class PublishDemo {
         publishWithMessage(smnClient);
 
         // publish with message structure
-        publishWithMessageStructure(smnClient);
-
-        // publish with message template
-        publishWithMessageTemplate(smnClient);
+//        publishWithMessageStructure(smnClient);
+//
+//        // publish with message template
+//        publishWithMessageTemplate(smnClient);
     }
 
     /**
@@ -63,7 +63,8 @@ public class PublishDemo {
 
         // 设置参数
         smnRequest.setSubject("test by zhangyx java2.0")
-                .setMessage("test by zhangyx java2.0 hahahah")
+                .setMessage("Event ID:231689;\nTrigger:[Web Monitoring] grafana for mtm is not accessable !;\nTrigger status: PROBLEM;\n" +
+                        "Trigger serverity: High;\nTrigger detail: Failed step of scenario")
                 .setTopicUrn("urn:smn:cn-north-1:cffe4fc4c9a54219b60dbaf7b586e132:create_by_zhangyx_test_csharp");
 
         // 发送请求
