@@ -57,8 +57,8 @@ public class ClientConfigurationDemo {
         // 初始化
         SmnClient smnClient = new DefaultSmnClient(
                 "YourAccountUserName",
-                "YourAccountPassword",
                 "YourAccountDomainName",
+                "YourAccountPassword",
                 "YourRegionName",
                 clientConfiguration);
 

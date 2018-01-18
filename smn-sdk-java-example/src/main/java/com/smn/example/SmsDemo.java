@@ -46,8 +46,8 @@ public class SmsDemo {
     public static void main(String[] args) {
         SmnClient smnClient = new DefaultSmnClient(
                 "YourAccountUserName",
-                "YourAccountPassword",
                 "YourAccountDomainName",
+                "YourAccountPassword",
                 "YourRegionName");
 
         // use aksk authentication
