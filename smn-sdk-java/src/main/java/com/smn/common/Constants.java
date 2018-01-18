@@ -26,7 +26,7 @@ public class Constants {
     public final static String DEFAULT_CONTENT_TYPE = "application/json; charset=UTF-8";
     public final static String DEFAULT_CHARSET = "UTF-8";
     public static final String HTTPS = "https://";
-    public static final String ENDPOINT = "myhwclouds.com";
+    public static final String ENDPOINT = "myhuaweicloud.com";
     public static final String IAM = "iam";
     public static final String SMN = "smn";
     public static final String URL_DELIMITER = "/";
