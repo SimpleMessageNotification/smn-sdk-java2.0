@@ -68,7 +68,7 @@ public class AkskSmnClient extends AbstractSmnClient {
 
         this.signer = new AkskSigner(smnConfiguration, Constants.SMN_SERVICE_NAME);
 
-        this.iamAuth = new IamAuth(smnConfiguration, httpTool, signer);
+        this.iamAuth = new IamAuth(smnConfiguration, clientConfiguration, httpTool, signer);
     }
 
     /**
@@ -86,7 +86,8 @@ public class AkskSmnClient extends AbstractSmnClient {
         }
         // 设置project id
         request.setProjectId(projectId);
-        request.setRegionName(this.smnConfiguration.getRegionName());
+        request.setSmnConfiguration(smnConfiguration);
+        request.setClientConfiguration(clientConfiguration);
 
         request.addHeader("region", smnConfiguration.getRegionName());
         request.addHeader("X-Project-Id", projectId);
@@ -111,14 +112,5 @@ public class AkskSmnClient extends AbstractSmnClient {
         } catch (Exception e) {
             throw new RuntimeException("Failed to sign for aksk.");
         }
-    }
-
-    /**
-     * add header for aksk
-     *
-     * @param request request message
-     */
-    private void addHeader(IHttpRequest request, String projectId) {
-
     }
 }

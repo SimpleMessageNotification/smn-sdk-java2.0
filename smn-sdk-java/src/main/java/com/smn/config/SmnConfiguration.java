@@ -11,6 +11,8 @@
  */
 package com.smn.config;
 
+import com.smn.common.Constants;
+
 /**
  * property loading configuration
  *
@@ -65,6 +67,16 @@ public class SmnConfiguration {
     private String secretAccessKey;
 
     /**
+     * smn service host url
+     */
+    private String smnHostUrl;
+
+    /**
+     * identity and access host url
+     */
+    private String iamHostUrl;
+
+    /**
      * new smnConfiguration
      *
      * @param userName   the userName to set
@@ -78,6 +90,8 @@ public class SmnConfiguration {
         this.domainName = domainName;
         this.regionName = regionId;
         this.authType = TOKEN_AUTH_TYPE;
+        this.smnHostUrl = Constants.HTTPS + Constants.SMN + "." + regionName + "." + Constants.ENDPOINT;
+        this.iamHostUrl  = Constants.HTTPS + Constants.IAM + "." + regionName + "." + Constants.ENDPOINT;
     }
 
     /**
@@ -92,6 +106,8 @@ public class SmnConfiguration {
         this.accessKeyId = accessKeyId;
         this.secretAccessKey = secretAccessKey;
         this.authType = AKSK_AUTH_TYPE;
+        this.smnHostUrl = Constants.HTTPS + Constants.SMN + "." + regionName + "." + Constants.ENDPOINT;
+        this.iamHostUrl  = Constants.HTTPS + Constants.IAM + "." + regionName + "." + Constants.ENDPOINT;
     }
 
     /**
@@ -145,4 +161,17 @@ public class SmnConfiguration {
         return authType;
     }
 
+    /**
+     * @return the smnHostUrl
+     */
+    public String getSmnHostUrl() {
+        return smnHostUrl;
+    }
+
+    /**
+     * @return the iamHostUrl
+     */
+    public String getIamHostUrl() {
+        return iamHostUrl;
+    }
 }
