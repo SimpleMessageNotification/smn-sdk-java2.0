@@ -63,7 +63,7 @@ public class DefaultSmnClient extends AbstractSmnClient {
 
         this.httpTool = new HttpTool(clientConfiguration);
 
-        this.iamAuth = new IamAuth(smnConfiguration, httpTool);
+        this.iamAuth = new IamAuth(smnConfiguration, clientConfiguration, httpTool);
     }
 
     /**
@@ -80,7 +80,8 @@ public class DefaultSmnClient extends AbstractSmnClient {
         }
 
         request.setProjectId(arrays[0]);
-        request.setRegionName(this.smnConfiguration.getRegionName());
+        request.setClientConfiguration(this.clientConfiguration);
+        request.setSmnConfiguration(this.smnConfiguration);
 
         request.addHeader("region", smnConfiguration.getRegionName());
         request.addHeader("X-Auth-Token", arrays[1]);

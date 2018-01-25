@@ -98,6 +98,16 @@ public class ClientConfiguration {
     private String proxyWorkstation;
 
     /**
+     * smn service host url
+     */
+    private String smnHostUrl;
+
+    /**
+     * identity and access host url
+     */
+    private String iamHostUrl;
+
+    /**
      * @return isAutoFailRetry
      */
     public boolean isAutoFailRetry() {
@@ -305,5 +315,33 @@ public class ClientConfiguration {
      */
     public void setMaxConnectionsPerRoute(int maxConnectionsPerRoute) {
         this.maxConnectionsPerRoute = maxConnectionsPerRoute;
+    }
+
+    /**
+     * @return smnHostUrl
+     */
+    public String getSmnHostUrl() {
+        return smnHostUrl;
+    }
+
+    /**
+     * @param smnHostUrl
+     */
+    public void setSmnHostUrl(String smnHostUrl) {
+        this.smnHostUrl = smnHostUrl;
+    }
+
+    /**
+     * @return iamHostUrl
+     */
+    public String getIamHostUrl() {
+        return iamHostUrl;
+    }
+
+    /**
+     * @param iamHostUrl
+     */
+    public void setIamHostUrl(String iamHostUrl) {
+        this.iamHostUrl = iamHostUrl;
     }
 }

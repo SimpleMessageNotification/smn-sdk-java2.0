@@ -11,6 +11,7 @@
  */
 package com.smn.auth;
 
+import com.smn.config.ClientConfiguration;
 import com.smn.config.SmnConfiguration;
 import com.smn.http.HttpResponse;
 import com.smn.http.HttpTool;
@@ -45,6 +46,11 @@ public class IamAuth {
     private SmnConfiguration smnConfiguration;
 
     /**
+     * client configuration
+     */
+    private ClientConfiguration clientConfiguration;
+
+    /**
      * http client
      */
     private HttpTool httpTool;
@@ -75,8 +81,9 @@ public class IamAuth {
      * @param smnConfiguration
      * @param httpTool
      */
-    public IamAuth(SmnConfiguration smnConfiguration, HttpTool httpTool) {
+    public IamAuth(SmnConfiguration smnConfiguration, ClientConfiguration clientConfiguration, HttpTool httpTool) {
         this.smnConfiguration = smnConfiguration;
+        this.clientConfiguration = clientConfiguration;
         this.httpTool = httpTool;
     }
 
@@ -87,10 +94,11 @@ public class IamAuth {
      * @param httpTool
      * @param signer
      */
-    public IamAuth(SmnConfiguration smnConfiguration, HttpTool httpTool, AkskSigner signer) {
+    public IamAuth(SmnConfiguration smnConfiguration, ClientConfiguration clientConfiguration, HttpTool httpTool, AkskSigner signer) {
         this.smnConfiguration = smnConfiguration;
         this.httpTool = httpTool;
         this.signer = signer;
+        this.clientConfiguration = clientConfiguration;
     }
 
     /**
@@ -111,6 +119,7 @@ public class IamAuth {
 
     /**
      * get the project Id for aksk
+     *
      * @return the project id
      */
     public String getProjectId() {
@@ -128,6 +137,7 @@ public class IamAuth {
     private void postForIamToken() {
         IamAuthRequest iamAuthRequest = new IamAuthRequest();
         iamAuthRequest.setSmnConfiguration(smnConfiguration);
+        iamAuthRequest.setClientConfiguration(clientConfiguration);
         iamAuthRequest.addHeader("X-Smn-sdk", VersionUtil.getSdkVersion());
 
         HttpResponse response = null;
@@ -160,7 +170,9 @@ public class IamAuth {
 
     private void postForPojectId() {
         GetProjectIdRequest request = new GetProjectIdRequest();
-        request.setName(smnConfiguration.getRegionName());
+        request.setClientConfiguration(clientConfiguration);
+        request.setSmnConfiguration(smnConfiguration);
+        request.setName(this.smnConfiguration.getRegionName());
         request.addHeader("X-Smn-sdk", VersionUtil.getSdkVersion());
 
         HttpResponse response = null;
