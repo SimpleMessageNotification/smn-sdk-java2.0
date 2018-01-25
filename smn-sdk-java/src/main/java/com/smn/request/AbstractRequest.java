@@ -11,7 +11,7 @@
  */
 package com.smn.request;
 
-import com.smn.common.Constants;
+import com.smn.config.ClientConfiguration;
 import com.smn.config.SmnConfiguration;
 import com.smn.http.HttpMethod;
 import com.smn.http.HttpResponse;
@@ -45,9 +45,14 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
     private Map<String, String> headerMap;
 
     /**
-     * region name
+     * smn configuration
      */
-    protected String regionName;
+    protected SmnConfiguration smnConfiguration;
+
+    /**
+     * client configuration
+     */
+    private ClientConfiguration clientConfiguration;
 
     /**
      * body parameters
@@ -108,6 +113,7 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
         }
         headerMap.put(key, value);
     }
+
     /**
      * parse httpResponse
      *
@@ -158,12 +164,27 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
     }
 
     /**
-     * get sms service url endpoint
+     * get sms service url
      *
      * @return smn service url
      */
     protected String getSmnServiceUrl() {
-        return Constants.HTTPS + Constants.SMN + "." + regionName + "." + Constants.ENDPOINT;
+        if (clientConfiguration != null && !StringUtil.isBlank(clientConfiguration.getSmnHostUrl())) {
+            return clientConfiguration.getSmnHostUrl();
+        }
+        return smnConfiguration.getSmnHostUrl();
+    }
+
+    /**
+     * get iam service url
+     *
+     * @return iam service url
+     */
+    protected String getIamServiceUrl() {
+        if (clientConfiguration != null && !StringUtil.isBlank(clientConfiguration.getIamHostUrl())) {
+            return clientConfiguration.getIamHostUrl();
+        }
+        return smnConfiguration.getIamHostUrl();
     }
 
     /**
@@ -177,6 +198,7 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
 
     /**
      * set project id
+     *
      * @param projectId
      */
     public void setProjectId(String projectId) {
@@ -184,16 +206,20 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
     }
 
     /**
-     * @return region name
+     * set smn configuration
+     *
+     * @param smnConfiguration
      */
-    public String getRegionName() {
-        return regionName;
+    public void setSmnConfiguration(SmnConfiguration smnConfiguration) {
+        this.smnConfiguration = smnConfiguration;
     }
 
     /**
-     * @param regionName
+     * set client configuration
+     *
+     * @param clientConfiguration
      */
-    public void setRegionName(String regionName) {
-        this.regionName = regionName;
+    public void setClientConfiguration(ClientConfiguration clientConfiguration) {
+        this.clientConfiguration = clientConfiguration;
     }
 }

@@ -11,6 +11,8 @@
  */
 package com.smn.request;
 
+import com.smn.config.ClientConfiguration;
+import com.smn.config.SmnConfiguration;
 import com.smn.http.HttpMethod;
 
 import java.util.Map;
@@ -67,9 +69,16 @@ public interface IHttpRequest {
     void setProjectId(String projectId);
 
     /**
-     * set region name
+     * set smn configuration
      *
-     * @param regionName
+     * @param smnConfiguration
      */
-    void setRegionName(String regionName);
+    void setSmnConfiguration(SmnConfiguration smnConfiguration);
+
+    /**
+     * set client configuration
+     *
+     * @param clientConfiguration
+     */
+    void setClientConfiguration(ClientConfiguration clientConfiguration);
 }

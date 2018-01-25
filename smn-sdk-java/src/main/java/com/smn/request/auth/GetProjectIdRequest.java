@@ -33,9 +33,8 @@ public class GetProjectIdRequest extends AbstractRequest {
 
     public String getUrl() {
         StringBuilder sb = new StringBuilder();
-        sb.append(Constants.HTTPS);
-        sb.append(Constants.IAM).append(".").append(name).append(".")
-                .append(Constants.ENDPOINT).append(Constants.IAM_PROJECT_URL);
+        sb.append(getIamServiceUrl());
+        sb.append(Constants.IAM_PROJECT_URL);
 
         // set query parameters
         sb.append(getQueryString());

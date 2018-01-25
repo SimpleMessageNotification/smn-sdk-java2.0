@@ -15,7 +15,6 @@ import com.smn.common.Constants;
 import com.smn.config.SmnConfiguration;
 import com.smn.http.HttpMethod;
 import com.smn.request.AbstractRequest;
-import com.smn.response.AbstractResponse;
 import com.smn.response.auth.IamAuthResponse;
 
 /**
@@ -26,20 +25,12 @@ import com.smn.response.auth.IamAuthResponse;
  */
 public class IamAuthRequest extends AbstractRequest<IamAuthResponse> {
 
-    /**
-     * smn configuration
-     */
-    private SmnConfiguration smnConfiguration;
-
     public HttpMethod getHttpMethod() {
         return HttpMethod.POST;
     }
 
     public String getUrl() {
-        return Constants.HTTPS + Constants.IAM + "."
-                + smnConfiguration.getRegionName() + "."
-                + Constants.ENDPOINT + Constants.IAM_TOKEN_URI;
-
+        return getIamServiceUrl() + Constants.IAM_TOKEN_URI;
     }
 
     public String getBodyParams() {
@@ -66,9 +57,5 @@ public class IamAuthRequest extends AbstractRequest<IamAuthResponse> {
                 "        }" +
                 "    }" +
                 "}";
-    }
-
-    public void setSmnConfiguration(SmnConfiguration smnConfiguration) {
-        this.smnConfiguration = smnConfiguration;
     }
 }
