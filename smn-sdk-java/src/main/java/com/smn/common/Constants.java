@@ -45,6 +45,8 @@ public class Constants {
     public final static String REPORT = "report";
     public final static String MESSAGE = "message";
     public final static String CALLBACK_REQUEST = "callback";
+    public final static String SMS_TEMPLATE = "sms_template";
+    public final static String SMS_PROMOTION = "promotion";
 
     public final static String TOPICS = "topics";
     public final static String ATTRIBUTES = "attributes";
