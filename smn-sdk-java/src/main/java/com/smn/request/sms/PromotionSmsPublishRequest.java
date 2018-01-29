@@ -16,6 +16,7 @@ import com.smn.common.Constants;
 import com.smn.http.HttpMethod;
 import com.smn.request.AbstractRequest;
 import com.smn.response.sms.PromotionSmsPublishResponse;
+import com.smn.util.StringUtil;
 
 import java.util.List;
 
@@ -46,6 +47,18 @@ public class PromotionSmsPublishRequest extends AbstractRequest<PromotionSmsPubl
 
     @Override
     public String getUrl() {
+        if (StringUtil.isEmpty(smsTemplateId)) {
+            throw new NullPointerException("sms template id is null.");
+        }
+
+        if (endpoints == null || endpoints.size() == 0) {
+            throw new NullPointerException("endpoints is null or empty.");
+        }
+
+        if (StringUtil.isEmpty(signId)) {
+            throw new NullPointerException("sign id is null.");
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append(getSmnServiceUrl());
         sb.append(Constants.URL_DELIMITER).append(Constants.V2).append(Constants.URL_DELIMITER)
