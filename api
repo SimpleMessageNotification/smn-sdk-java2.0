@@ -1,0 +1,90 @@
+1) 发送推广类模板
+POST /v2/{project_id}/notifications/sms/promotion
+
+请求体Request Body
+{
+    "endpoints":[ "18676696912", "18676696913","18246161627","18246161627"],
+    "sms_template_id": "1dd49958037a47e2bd2313ed04628638",
+    "sign_id": "5dd49958037a47e2bd2313ed04628638"
+}
+
+响应体Response：
+{ 
+    "request_id": "9974c07f6d554a6d827956acbeb4be5f" .
+    "result": [
+          {
+                "message_id": "bf94b63a5dfb475994d3ac34664e24f2", 
+                "endpoint": "8615911119348
+          },
+          {
+                "code": "SMN.0087",
+                "message": "Fail send this message.", 
+                "endpoint": "8615921119348"
+          }
+     ]  
+}
+
+
+2) 创建推广模板  
+POST /v2/{project_id}/notifications/sms_template 
+
+REQUEST BODY: 
+{
+  "sms_template_name":"template name",
+  "sms_template_content":"template content",
+  "remark":"备注",
+  "sms_template_type":1
+}
+
+响应体RESPONSE: 
+{
+  "request_id":"xxxxxx",
+  "sms_template_id":"xxxxxx"
+}
+
+3) 查询推广模板（暂定template name为模糊查询，需与丹建确认）  
+
+GET /v2/{project_id}/notifications/sms_template?offset=0&limit=2&sms_template_name=推广消息&status=3&sms_template_type=0 
+
+RESPONSE 
+{
+    "request_id":"ce7f2f7343224f8c9597b05a9a0bcc2e",
+    "count":1,
+    "sms_templates": [{
+            "sms_template_name": "推广消息",
+            "sms_template_type":0,
+            "create_time": "2017-11-11T14:46:29Z",
+            "sms_template_id": "xxxxxxxx"
+            "status": 3,
+            "reply": “供应商提供的失败原因”,
+            "validity_end_time": "有效截止时间, 只返回日期，不包含时分秒"
+     }]
+}
+
+查询场景(都是可选)： 
+offset
+limit
+sms_template_name
+sms_template_type
+status
+
+
+
+4) 查询推广模板详情
+
+GET /v2/{project_id}/notifications/sms_template/{sms_template_id}
+
+RESPONSE 
+{
+    "request_id":"ce7f2f7343224f8c9597b05a9a0bcc2e"
+     "sms_template _content" : "您已成功预定xxx酒店"
+}
+
+5) 删除推广模板 
+
+DELETE /v2/{project_id}/notifications/sms_template/{sms_template_id} 
+
+响应体RESPONSE
+{
+  "request_id":"xxxxxx"
+}
