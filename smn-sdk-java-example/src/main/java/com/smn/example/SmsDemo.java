@@ -33,6 +33,7 @@ public class SmsDemo {
                 "YourAccountDomainName",
                 "YourAccountPassword",
                 "YourRegionName");
+
         // use aksk authentication
 //        SmnClient smnClient = new AkskSmnClient(
 //                "YourAccessKeyId",
@@ -40,8 +41,8 @@ public class SmsDemo {
 //                "YourRegionName"
 //        );
 
-//        // 发送通知验证码类短信，send sms
-//        smsPublish(smnClient);
+        // 发送通知验证码类短信，send sms
+        smsPublish(smnClient);
 
         //发送推广类短信
         promotionSmsPublish(smnClient);
@@ -49,23 +50,23 @@ public class SmsDemo {
         // 创建短信模板
         createSmsTemplate(smnClient);
 
-//        // 查询签名 list sms signs
-//        listSmsSigns(smnClient);
-//
-//        // delete sms sign
-//        deleteSmsSign(smnClient);
-//
-//        //list sms msg report
-//        listSmsMsgReport(smnClient);
-//
-//        //get sms message content
-//        getSmsMessage(smnClient);
-//
-//        //ListSmsEvent
-//        listSmsEvent(smnClient);
-//
-//        // update sms event
-//        updateSmsEvent(smnClient);
+        // 查询签名 list sms signs
+        listSmsSigns(smnClient);
+
+        // delete sms sign
+        deleteSmsSign(smnClient);
+
+        //list sms msg report
+        listSmsMsgReport(smnClient);
+
+        //get sms message content
+        getSmsMessage(smnClient);
+
+        //ListSmsEvent
+        listSmsEvent(smnClient);
+
+        // update sms event
+        updateSmsEvent(smnClient);
 
         // list sms templates
         listSmsTemplates(smnClient);
