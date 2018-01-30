@@ -63,6 +63,7 @@ public class PromotionSmsPublishRequest extends AbstractRequest<PromotionSmsPubl
         sb.append(getSmnServiceUrl());
         sb.append(Constants.URL_DELIMITER).append(Constants.V2).append(Constants.URL_DELIMITER)
                 .append(projectId).append(Constants.URL_DELIMITER).append(Constants.SMN_NOTIFICATIONS)
+                .append(Constants.URL_DELIMITER).append(Constants.SMN_SUB_PROTOCOL_SMS)
                 .append(Constants.URL_DELIMITER).append(Constants.SMS_PROMOTION);
         return sb.toString();
     }

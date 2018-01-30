@@ -33,7 +33,6 @@ public class SmsDemo {
                 "YourAccountDomainName",
                 "YourAccountPassword",
                 "YourRegionName");
-
         // use aksk authentication
 //        SmnClient smnClient = new AkskSmnClient(
 //                "YourAccessKeyId",
@@ -41,29 +40,32 @@ public class SmsDemo {
 //                "YourRegionName"
 //        );
 
-        // 发送通知验证码类短信，send sms
-        smsPublish(smnClient);
+//        // 发送通知验证码类短信，send sms
+//        smsPublish(smnClient);
 
         //发送推广类短信
         promotionSmsPublish(smnClient);
 
-        // 查询签名 list sms signs
-        listSmsSigns(smnClient);
+        // 创建短信模板
+        createSmsTemplate(smnClient);
 
-        // delete sms sign
-        deleteSmsSign(smnClient);
-
-        //list sms msg report
-        listSmsMsgReport(smnClient);
-
-        //get sms message content
-        getSmsMessage(smnClient);
-
-        //ListSmsEvent
-        listSmsEvent(smnClient);
-
-        // update sms event
-        updateSmsEvent(smnClient);
+//        // 查询签名 list sms signs
+//        listSmsSigns(smnClient);
+//
+//        // delete sms sign
+//        deleteSmsSign(smnClient);
+//
+//        //list sms msg report
+//        listSmsMsgReport(smnClient);
+//
+//        //get sms message content
+//        getSmsMessage(smnClient);
+//
+//        //ListSmsEvent
+//        listSmsEvent(smnClient);
+//
+//        // update sms event
+//        updateSmsEvent(smnClient);
 
         // list sms templates
         listSmsTemplates(smnClient);
@@ -86,7 +88,7 @@ public class SmsDemo {
         // 设置参数
         smnRequest.setEndpoint("+8613688807587")
                 .setMessage("您的验证码是:1234，请查收")
-                .setSignId("6be340e91e5241e4b5d85837e6709104");
+                .setSignId("920c5bd4b40b4261a5acf7eb8dba1a4a");
 
         // 发送短信
         try {
@@ -110,28 +112,58 @@ public class SmsDemo {
 
         // 设置参数
         List<String> endpoints = new ArrayList<String>();
-        endpoints.add("86136***07587");
+        endpoints.add("8613688807587");
 
-        smnRequest.setSignId("6be340e91e5********85837e6709104")
-                .setSmsTemplateId("abcd40e91e5********85837e6235645")
+        smnRequest.setSignId("47f86cf7c9a7449d98ee61cf193a1060")
+                .setSmsTemplateId("bfda25c6406e42ddabad74b4a20f6d05")
                 .setEndpoints(endpoints);
 
         // 发送短信
         try {
             PromotionSmsPublishResponse res = smnClient.sendRequest(smnRequest);
+
+            System.out.println(smnRequest.getUrl());
+
             System.out.println("httpCode:" + res.getHttpCode()
                     + ", request_id:" + res.getRequestId()
                     + ", errormessage:" + res.getMessage());
-
-            for (PromotionSmsPublishResult result : res.getResult()) {
-                StringBuilder sb = new StringBuilder("PromotionSmsPublishResult{");
-                sb.append("messageId='").append(result.getMessageId()).append('\'');
-                sb.append(", endpoint='").append(result.getEndpoint()).append('\'');
-                sb.append(", code='").append(result.getCode()).append('\'');
-                sb.append(", message='").append(result.getMessage()).append('\'');
-                sb.append('}');
-                System.out.println(sb.toString());
+            if (res.isSuccess()) {
+                for (PromotionSmsPublishResult result : res.getResult()) {
+                    StringBuilder sb = new StringBuilder("PromotionSmsPublishResult{");
+                    sb.append("messageId='").append(result.getMessageId()).append('\'');
+                    sb.append(", endpoint='").append(result.getEndpoint()).append('\'');
+                    sb.append(", code='").append(result.getCode()).append('\'');
+                    sb.append(", message='").append(result.getMessage()).append('\'');
+                    sb.append('}');
+                    System.out.println(sb.toString());
+                }
             }
+        } catch (Exception e) {
+            // 处理异常
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 创建短信模板
+     */
+    public static void createSmsTemplate(SmnClient smnClient) {
+        // 构造请求对象
+        CreateSmsTemplateRequest smnRequest = new CreateSmsTemplateRequest();
+
+        //设置参数
+        smnRequest.setRemark("helloworld");
+        smnRequest.setSmsTemplateContent("拒绝套路，全线低价！快戳http://t.cn/RWafjJ，如有疑问详细4000-955-988转1，退订回TD");
+        smnRequest.setSmsTemplateName("拒绝套路1234");
+        smnRequest.setSmsTemplateType(1);
+
+        // 发送短信
+        try {
+            CreateSmsTemplateResponse res = smnClient.sendRequest(smnRequest);
+            System.out.println("httpCode:" + res.getHttpCode()
+                    + ", request_id:" + res.getRequestId()
+                    + ", sms_template_id:" + res.getSmsTemplateId()
+                    + ", errormessage:" + res.getMessage());
         } catch (Exception e) {
             // 处理异常
             e.printStackTrace();
@@ -341,14 +373,13 @@ public class SmsDemo {
 
     /**
      * 查询短信模板详情
-     *
      */
     public static void getSmsTemplateDetail(SmnClient smnClient) {
         // 构造请求对象
         GetSmsTemplateDetailRequest smnRequest = new GetSmsTemplateDetailRequest();
 
         // 设置参数
-        smnRequest.setSmsTemplateId("6be340e91e5********85837e6709104");
+        smnRequest.setSmsTemplateId("bfda25c6406e42ddabad74b4a20f6d05");
 
         // 发送请求
         try {
@@ -372,14 +403,13 @@ public class SmsDemo {
 
     /**
      * 删除短信模板
-     *
      */
     public static void deleteSmsTemplate(SmnClient smnClient) {
         // 构造请求对象
         DeleteSmsTemplateRequest smnRequest = new DeleteSmsTemplateRequest();
 
         // 设置参数
-        smnRequest.setSmsTemplateId("6be340e91e5********85837e6709104");
+        smnRequest.setSmsTemplateId("ff5ef17024dd4ff3a79eaac7adf558a8");
 
         // 发送请求
         try {

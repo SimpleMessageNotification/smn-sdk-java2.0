@@ -28,7 +28,7 @@ public class GetSmsTemplateDetailResponse extends AbstractResponse {
     @JsonProperty("sms_template_type")
     private int smsTemplateType;
     @JsonProperty("sms_template_content")
-    private int smsTemplateContent;
+    private String smsTemplateContent;
     @JsonProperty("sms_template_id")
     private String smsTemplateId;
     @JsonProperty("reply")
@@ -56,11 +56,11 @@ public class GetSmsTemplateDetailResponse extends AbstractResponse {
         this.smsTemplateType = smsTemplateType;
     }
 
-    public int getSmsTemplateContent() {
+    public String getSmsTemplateContent() {
         return smsTemplateContent;
     }
 
-    public void setSmsTemplateContent(int smsTemplateContent) {
+    public void setSmsTemplateContent(String smsTemplateContent) {
         this.smsTemplateContent = smsTemplateContent;
     }
 

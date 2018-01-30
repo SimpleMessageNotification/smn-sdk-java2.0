@@ -70,6 +70,7 @@ public class ListSmsTemplatesRequest extends AbstractRequest<ListSmsTemplatesRes
         sb.append(Constants.URL_DELIMITER).append(Constants.V2).append(Constants.URL_DELIMITER)
                 .append(projectId).append(Constants.URL_DELIMITER).append(Constants.SMN_NOTIFICATIONS)
                 .append(Constants.URL_DELIMITER).append(Constants.SMS_TEMPLATE);
+        sb.append(getQueryString());
         return sb.toString();
     }
 
