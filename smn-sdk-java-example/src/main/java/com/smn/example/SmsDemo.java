@@ -122,9 +122,7 @@ public class SmsDemo {
         // 发送短信
         try {
             PromotionSmsPublishResponse res = smnClient.sendRequest(smnRequest);
-
-            System.out.println(smnRequest.getUrl());
-
+            
             System.out.println("httpCode:" + res.getHttpCode()
                     + ", request_id:" + res.getRequestId()
                     + ", errormessage:" + res.getMessage());
