@@ -36,7 +36,12 @@ public class ValidationUtil {
     /**
      * validate templateName
      */
-    final static Pattern PATTERN_TMPLATE_NAME = Pattern.compile("^[a-zA-Z0-9]{1}([-_a-zA-Z0-9]){0,64}");
+    final static Pattern PATTERN_TEMPLATE_NAME = Pattern.compile("^[a-zA-Z0-9]{1}([-_a-zA-Z0-9]){0,64}");
+
+    /**
+     * validate sms templateName
+     */
+    final static Pattern PATTERN_SMS_TEMPLATE_NAME = Pattern.compile("[-a-zA-Z0-9\u4e00-\u9fa5]{0,64}");
 
     /**
      * validate subjet regex
@@ -137,7 +142,7 @@ public class ValidationUtil {
         if (StringUtil.isBlank(templateName)) {
             return false;
         }
-        return PATTERN_TMPLATE_NAME.matcher(templateName).matches();
+        return PATTERN_TEMPLATE_NAME.matcher(templateName).matches();
     }
 
     /**
@@ -194,5 +199,19 @@ public class ValidationUtil {
      */
     public static boolean validateLimit(int limit) {
         return limit > 0 && limit <= 100;
+    }
+
+    /**
+     * validate sms template name
+     *
+     * @param templateName the sms template name to validate
+     * @return boolean
+     * if valid return <code>true</code>, else return <code>false</code>
+     */
+    public static boolean validateSmsTemplateName(String templateName) {
+        if (StringUtil.isBlank(templateName)) {
+            return false;
+        }
+        return PATTERN_SMS_TEMPLATE_NAME.matcher(templateName).matches();
     }
 }
