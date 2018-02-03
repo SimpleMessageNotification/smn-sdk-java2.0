@@ -1,3 +1,7 @@
 2018-01-10 version 2.0.0:
 1.Optimize code, fix bug
 2.Add a custom connection pool and failure retry
+
+2018-02-02 version 2.0.1:
+1.Add sms template
+2.Optimize code
