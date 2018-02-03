@@ -50,7 +50,7 @@ public class ListSmsMsgReportRequest extends AbstractRequest<ListSmsMsgReportRes
      * 1 send success
      * 0 send fail
      */
-    private String status;
+    private int status;
 
     /**
      * the offset of the query
@@ -110,9 +110,9 @@ public class ListSmsMsgReportRequest extends AbstractRequest<ListSmsMsgReportRes
         return this;
     }
 
-    public ListSmsMsgReportRequest setStatus(String status) {
+    public ListSmsMsgReportRequest setStatus(int status) {
         this.status = status;
-        this.queryMap.put("status", status);
+        this.queryMap.put("status", String.valueOf(status));
         return this;
     }
 
@@ -144,7 +144,7 @@ public class ListSmsMsgReportRequest extends AbstractRequest<ListSmsMsgReportRes
         return mobile;
     }
 
-    public String getStatus() {
+    public int getStatus() {
         return status;
     }
 
