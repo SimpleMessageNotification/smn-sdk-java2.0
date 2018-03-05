@@ -45,14 +45,29 @@ public class ClientConfiguration {
     private boolean ignoreCertificate = false;
 
     /**
-     * Key library path
+     * client cert Key library path
      */
     private String keyStorePath;
 
     /**
-     * Key library cipher
+     * client cert Key store password
      */
     private String keyStorePass;
+
+    /**
+     * client key password
+     */
+    private String keyPass;
+
+    /**
+     * trust server cert store path
+     */
+    private String trustStorePath;
+
+    /**
+     * trust server cert store pass
+     */
+    private String trustStorePass;
 
     /**
      * 最大HTTP连接数。
@@ -343,5 +358,50 @@ public class ClientConfiguration {
      */
     public void setIamHostUrl(String iamHostUrl) {
         this.iamHostUrl = iamHostUrl;
+    }
+
+    /**
+     * @return keyPass
+     */
+    public String getKeyPass() {
+        return keyPass;
+    }
+
+    /**
+     * @param keyPass
+     */
+    public ClientConfiguration setKeyPass(String keyPass) {
+        this.keyPass = keyPass;
+        return this;
+    }
+
+    /**
+     * @return trustStorePath
+     */
+    public String getTrustStorePath() {
+        return trustStorePath;
+    }
+
+    /**
+     * @param trustStorePath
+     */
+    public ClientConfiguration setTrustStorePath(String trustStorePath) {
+        this.trustStorePath = trustStorePath;
+        return this;
+    }
+
+    /**
+     * @return trustStorePass
+     */
+    public String getTrustStorePass() {
+        return trustStorePass;
+    }
+
+    /**
+     * @param trustStorePass
+     */
+    public ClientConfiguration setTrustStorePass(String trustStorePass) {
+        this.trustStorePass = trustStorePass;
+        return this;
     }
 }

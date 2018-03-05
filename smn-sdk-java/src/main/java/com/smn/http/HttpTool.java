@@ -21,7 +21,13 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.NTCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -41,13 +47,12 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.util.EntityUtils;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.File;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -122,6 +127,8 @@ public class HttpTool {
             throw new RuntimeException(e);
         } catch (KeyManagementException e) {
             throw new RuntimeException(e);
+        } catch (UnrecoverableKeyException e) {
+            throw new RuntimeException(e);
         } finally {
             try {
                 if (response != null) {
@@ -192,7 +199,7 @@ public class HttpTool {
      * @throws Exception
      */
     public CloseableHttpClient getHttpClient()
-            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, KeyManagementException {
+            throws CertificateException, NoSuchAlgorithmException, KeyStoreException, IOException, KeyManagementException, UnrecoverableKeyException {
         if (clientConfiguration == null) {
             clientConfiguration = new ClientConfiguration();
         }
@@ -269,52 +276,14 @@ public class HttpTool {
     }
 
     private SSLConnectionSocketFactory createSslConnectionSocketFactory()
-            throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, CertificateException, IOException {
+            throws NoSuchAlgorithmException, KeyManagementException, KeyStoreException, CertificateException, IOException, UnrecoverableKeyException {
 
         // default
-        SSLContext sslContext = null;
-
-        // is ignore certificate verification
-        if (!clientConfiguration.isIgnoreCertificate()) {
-            sslContext = createSSLContext(clientConfiguration.getKeyStorePath(), clientConfiguration.getKeyStorePass(),
-                    new TrustSelfSignedStrategy(), "TLSv1.2");
-        } else {
-            sslContext = buildContextIgnoreCertificate();
-
-        }
+        SSLContext sslContext = createSSLContext("TLSv1.2");
 
         return new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
     }
 
-    /**
-     * build SSLContext with all trust
-     *
-     * @return SSLContext
-     * @throws KeyStoreException
-     * @throws NoSuchAlgorithmException
-     * @throws KeyManagementException
-     */
-    private SSLContext buildContextIgnoreCertificate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, CertificateException, IOException {
-        SSLContext sslContext = createSSLContext(null, null,
-                new TrustSelfSignedStrategy(), "TLSv1.2");
-
-        X509TrustManager tm = new X509TrustManager() {
-            public void checkClientTrusted(X509Certificate[] chain,
-                                           String authType) throws CertificateException {
-            }
-
-            public void checkServerTrusted(X509Certificate[] chain,
-                                           String authType) throws CertificateException {
-            }
-
-            public X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-        };
-        sslContext.init(null, new TrustManager[]{tm}, null);
-
-        return sslContext;
-    }
 
     /**
      * 循环校验http协议是否支持，依次顺序是TLSv1.2->TLSv1.1->TLSv1.0->TLS
@@ -322,10 +291,7 @@ public class HttpTool {
      * Loop check whether the HTTP protocol is supported
      * in sequence is TLSv1.2->TLSv1.1->TLSv1.0->TLS
      *
-     * @param keyStorePath key store path
-     * @param keyStorePass key store pass
-     * @param strategy     stategy
-     * @param protocol     current protocol to check
+     * @param protocol current protocol to check
      * @return SSLContext
      * @throws KeyStoreException
      * @throws KeyManagementException
@@ -333,19 +299,35 @@ public class HttpTool {
      * @throws CertificateException
      * @throws IOException
      */
-    private SSLContext createSSLContext(String keyStorePath, String keyStorePass,
-                                        TrustStrategy strategy, String protocol)
-            throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException, CertificateException, IOException {
+    private SSLContext createSSLContext(String protocol)
+            throws KeyStoreException, KeyManagementException, NoSuchAlgorithmException, CertificateException, IOException, UnrecoverableKeyException {
         SSLContextBuilder builder = new SSLContextBuilder().useProtocol(protocol);
 
         try {
-            if (!StringUtil.isBlank(keyStorePath) && !StringUtil.isBlank(keyStorePass)) {
-                builder.loadTrustMaterial(
-                        new File(keyStorePath),
-                        keyStorePass.toCharArray(),
-                        strategy);
+            if (!StringUtil.isBlank(clientConfiguration.getKeyStorePath())
+                    && !StringUtil.isBlank(clientConfiguration.getKeyStorePass())
+                    && !StringUtil.isBlank(clientConfiguration.getKeyPass())) {
+                builder.loadKeyMaterial(
+                        new File(clientConfiguration.getKeyStorePath()),
+                        clientConfiguration.getKeyStorePass().toCharArray(),
+                        clientConfiguration.getKeyPass().toCharArray());
+            }
+
+            //忽略服务器证书验证
+            if (clientConfiguration.isIgnoreCertificate()) {
+                builder.loadTrustMaterial(new TrustStrategy() {
+                    public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                        return true;
+                    }
+                });
             } else {
-                builder.loadTrustMaterial(null, strategy);
+                if (!StringUtil.isBlank(clientConfiguration.getTrustStorePass())
+                        && !StringUtil.isBlank(clientConfiguration.getTrustStorePath())) {
+                    builder.loadTrustMaterial(
+                            new File(clientConfiguration.getKeyStorePath()),
+                            clientConfiguration.getTrustStorePass().toCharArray(),
+                            new TrustSelfSignedStrategy());
+                }
             }
 
             return builder.build();
@@ -353,7 +335,7 @@ public class HttpTool {
             if (PROTOCOL_MAP.get(protocol) != null) {
                 // 继续重试下一个协议是否支持.
                 // Continue to retry the next protocol to support.
-                createSSLContext(keyStorePath, keyStorePass, strategy, PROTOCOL_MAP.get(protocol));
+                createSSLContext(PROTOCOL_MAP.get(protocol));
             } else {
                 // 如果所有的协议都重试了，则抛出异常.
                 // If all the protocols are retried, the exception is thrown.
