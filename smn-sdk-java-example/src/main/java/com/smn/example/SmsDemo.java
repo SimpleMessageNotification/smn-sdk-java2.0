@@ -44,7 +44,7 @@ public class SmsDemo {
         // 发送通知验证码类短信，send sms
         smsPublish(smnClient);
 
-        // 批量发送通知验证内短信
+        // 批量发送通知验证类短信
         batchPublishSmsMessagePublish(smnClient);
 
         // 批量发送推广类短信
@@ -147,7 +147,7 @@ public class SmsDemo {
     }
 
     /**
-     * 批量发送推广类短信
+     * 批量发送通知验证类短信
      */
     public static void batchPublishSmsMessagePublish(SmnClient smnClient) {
         // 构造请求对象

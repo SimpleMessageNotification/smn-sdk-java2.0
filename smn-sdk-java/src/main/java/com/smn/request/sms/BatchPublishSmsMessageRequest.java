@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class BatchPublishSmsMessageRequest extends AbstractRequest<BatchPublishSmsMessageResponse> {
     /**
-     * sms template id
+     * sms message content
      */
     private String message;
     /**
