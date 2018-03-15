@@ -30,4 +30,9 @@ public interface SmnClient {
      * @return response data
      */
     <T extends AbstractResponse> T sendRequest(AbstractRequest<T> request);
+
+    /**
+     * clean cache token
+     */
+    void cleanToken();
 }

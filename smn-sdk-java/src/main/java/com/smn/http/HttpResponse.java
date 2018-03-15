@@ -99,4 +99,13 @@ public class HttpResponse {
     public boolean isSuccess() {
         return 200 <= httpCode && httpCode < 300;
     }
+
+    /**
+     * Judge whether the request is no permission
+     *
+     * @return true if httpcode is equal to 403
+     */
+    public boolean isNoPermission() {
+        return 403 == httpCode;
+    }
 }
