@@ -44,7 +44,10 @@ public class SmsDemo {
         // 发送通知验证码类短信，send sms
         smsPublish(smnClient);
 
-        //发送推广类短信
+        // 批量发送通知验证类短信
+        batchPublishSmsMessagePublish(smnClient);
+
+        // 批量发送推广类短信
         promotionSmsPublish(smnClient);
 
         // 创建短信模板
@@ -105,7 +108,7 @@ public class SmsDemo {
     }
 
     /**
-     * 发送推广类短信
+     * 批量发送推广类短信
      */
     public static void promotionSmsPublish(SmnClient smnClient) {
         // 构造请求对象
@@ -129,6 +132,46 @@ public class SmsDemo {
             if (res.isSuccess()) {
                 for (PromotionSmsPublishResult result : res.getResult()) {
                     StringBuilder sb = new StringBuilder("PromotionSmsPublishResult{");
+                    sb.append("messageId='").append(result.getMessageId()).append('\'');
+                    sb.append(", endpoint='").append(result.getEndpoint()).append('\'');
+                    sb.append(", code='").append(result.getCode()).append('\'');
+                    sb.append(", message='").append(result.getMessage()).append('\'');
+                    sb.append('}');
+                    System.out.println(sb.toString());
+                }
+            }
+        } catch (Exception e) {
+            // 处理异常
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 批量发送通知验证类短信
+     */
+    public static void batchPublishSmsMessagePublish(SmnClient smnClient) {
+        // 构造请求对象
+        BatchPublishSmsMessageRequest smnRequest = new BatchPublishSmsMessageRequest();
+
+        // 设置参数
+        List<String> endpoints = new ArrayList<String>();
+        endpoints.add("8613****7587");
+        endpoints.add("1598****83");
+
+        smnRequest.setSignId("6be340e91e5241e4b5d85837e6709104")
+                .setMessage("您的验证码是:1234，请查收")
+                .setEndpoints(endpoints);
+
+        // 发送短信
+        try {
+            BatchPublishSmsMessageResponse res = smnClient.sendRequest(smnRequest);
+
+            System.out.println("httpCode:" + res.getHttpCode()
+                    + ", request_id:" + res.getRequestId()
+                    + ", errormessage:" + res.getMessage());
+            if (res.isSuccess()) {
+                for (BatchPublishSmsMessageResult result : res.getResult()) {
+                    StringBuilder sb = new StringBuilder("BatchPublishSmsMessageResult{");
                     sb.append("messageId='").append(result.getMessageId()).append('\'');
                     sb.append(", endpoint='").append(result.getEndpoint()).append('\'');
                     sb.append(", code='").append(result.getCode()).append('\'');
