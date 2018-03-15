@@ -118,6 +118,13 @@ public class IamAuth {
     }
 
     /**
+     * clean cache token
+     */
+    public void cleanToken() {
+        this.authToken = null;
+    }
+
+    /**
      * get the project Id for aksk
      *
      * @return the project id
