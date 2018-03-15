@@ -66,7 +66,21 @@ public abstract class AbstractSmnClient implements SmnClient {
             retryTimes++;
         }
 
+        if(httpResponse.isNoPermission()) {
+            // if no permission to clear the cache
+            cleanToken();
+        }
+
         return request.getResponse(httpResponse);
+    }
+
+    /**
+     * clean token, only use for token auth
+     */
+    public void cleanToken() {
+        if (iamAuth != null) {
+            iamAuth.cleanToken();
+        }
     }
 
     /**

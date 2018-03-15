@@ -18,20 +18,20 @@ import com.smn.response.AbstractResponse;
 import java.util.List;
 
 /**
- * the response data for publish promotion sms
+ * the response data for batch publish Notifications and verification code SMS
  *
  * @author zhangyx
- * @version 2.0.1
+ * @version 2.0.2
  */
-public class PromotionSmsPublishResponse extends AbstractResponse {
+public class BatchPublishSmsMessageResponse extends AbstractResponse {
     @JsonProperty("result")
-    private List<PromotionSmsPublishResult> result;
+    private List<BatchPublishSmsMessageResult> result;
 
-    public List<PromotionSmsPublishResult> getResult() {
+    public List<BatchPublishSmsMessageResult> getResult() {
         return result;
     }
 
-    public void setResult(List<PromotionSmsPublishResult> result) {
+    public void setResult(List<BatchPublishSmsMessageResult> result) {
         this.result = result;
     }
 }
