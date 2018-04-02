@@ -11,12 +11,8 @@
  */
 package com.smn.signer;
 
-import com.cloud.sdk.DefaultRequest;
-import com.cloud.sdk.Request;
-import com.cloud.sdk.auth.credentials.BasicCredentials;
-import com.cloud.sdk.auth.signer.SignerFactory;
-import com.cloud.sdk.http.HttpMethodName;
 import com.smn.config.SmnConfiguration;
+import com.smn.http.HttpMethod;
 import com.smn.request.IHttpRequest;
 import org.apache.http.HttpHeaders;
 
@@ -64,7 +60,7 @@ public class AkskSigner {
      * @throws Exception signature error throw exception
      */
     public void get(IHttpRequest smnRequest, URL url) throws Exception {
-        Map<String, String> headers = this.getSignHeader(url, null, null, HttpMethodName.GET);
+        Map<String, String> headers = this.getSignHeader(url, null, null, HttpMethod.GET);
 
         for (String key : headers.keySet()) {
             if (key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH.toString())) {
@@ -82,7 +78,7 @@ public class AkskSigner {
      * @throws Exception signature error throw exception
      */
     public void delete(IHttpRequest smnRequest, URL url) throws Exception {
-        Map<String, String> headers = this.getSignHeader(url, null, null, HttpMethodName.DELETE);
+        Map<String, String> headers = this.getSignHeader(url, null, null, HttpMethod.DELETE);
 
         for (String key : headers.keySet()) {
             if (key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH.toString())) {
@@ -102,7 +98,7 @@ public class AkskSigner {
      */
     public void post(IHttpRequest smnRequest, URL url, String postbody) throws Exception {
         InputStream content = new ByteArrayInputStream(postbody.getBytes());
-        Map<String, String> headers = this.getSignHeader(url, null, content, HttpMethodName.POST);
+        Map<String, String> headers = this.getSignHeader(url, null, content, HttpMethod.POST);
         for (String key : headers.keySet()) {
             if (key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH.toString())) {
                 continue;
@@ -121,7 +117,7 @@ public class AkskSigner {
      */
     public void put(IHttpRequest smnRequest, URL url, String postbody) throws Exception {
         InputStream content = new ByteArrayInputStream(postbody.getBytes());
-        Map<String, String> headers = this.getSignHeader(url, null, content, HttpMethodName.PUT);
+        Map<String, String> headers = this.getSignHeader(url, null, content, HttpMethod.PUT);
         for (String key : headers.keySet()) {
             if (key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH.toString())) {
                 continue;
@@ -131,11 +127,11 @@ public class AkskSigner {
     }
 
     private Map<String, String> getSignHeader(URL url, Map<String, String> headers,
-                                              InputStream content, HttpMethodName httpMethod)
+                                              InputStream content, HttpMethod httpMethod)
             throws Exception {
 
         // Make a request for signing.
-        Request request = new DefaultRequest(serviceName);
+        SignerRequest request = new SignerRequest(serviceName);
         try {
             // Set the request address.
             request.setEndpoint(url.toURI());
@@ -174,9 +170,10 @@ public class AkskSigner {
         request.setContent(content);
 
         // Select an algorithm for request signing.
-        com.cloud.sdk.auth.signer.Signer signer = SignerFactory.getSigner(serviceName, smnConfiguration.getRegionName());
+        //com.cloud.sdk.auth.signer.Signer signer = SignerFactory.getSigner(serviceName, smnConfiguration.getRegionName());
         // Sign the request, and the request will change after the signing.
-        signer.sign(request, new BasicCredentials(smnConfiguration.getAccessKeyId(), smnConfiguration.getSecretAccessKey()));
+        DefaultSigner signer = new DefaultSigner();
+        signer.sign(smnConfiguration.getRegionName(), serviceName, request, smnConfiguration.getSecretAccessKey(), smnConfiguration.getAccessKeyId());
 
         // Make a request that can be sent by the HTTP client.
         Map<String, String> map = new HashMap<String, String>();
