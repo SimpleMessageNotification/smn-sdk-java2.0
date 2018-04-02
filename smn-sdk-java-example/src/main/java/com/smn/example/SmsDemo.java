@@ -47,6 +47,9 @@ public class SmsDemo {
         // 批量发送通知验证类短信
         batchPublishSmsMessagePublish(smnClient);
 
+        // 批量发送不同内容的通知验证码类短信
+        smsBatchPublishWithDiffMessage(smnClient);
+
         // 批量发送推广类短信
         promotionSmsPublish(smnClient);
 
@@ -90,9 +93,11 @@ public class SmsDemo {
         SmsPublishRequest smnRequest = new SmsPublishRequest();
 
         // 设置参数
-        smnRequest.setEndpoint("+8613688807587")
+        // MessageIncludeSignFlag为true时，可以不传SignId, 但是内容中必须包含签名,如【华为云】您的验证码是:1234，请查收。签名以【】括起来放在内容头部或者尾部
+        smnRequest.setEndpoint("+86136*****87")
                 .setMessage("您的验证码是:1234，请查收")
-                .setSignId("920c5bd4b40b4261a5acf7eb8dba1a4a");
+                .setSignId("6be340e91e5241e4b5d85837e6709104")
+                .setMessageIncludeSignFlag(false);
 
         // 发送短信
         try {
@@ -108,6 +113,51 @@ public class SmsDemo {
     }
 
     /**
+     * 不同内容批量发送通知类验证码类短信demo
+     */
+    public static void smsBatchPublishWithDiffMessage(SmnClient smnClient) {
+        final SmsPublishMessage message1 = new SmsPublishMessage();
+        message1.setSignId("6be340e91e5241e4b5d85837e6709104");
+        message1.setMessage("您的验证码是:12345，请查收");
+        message1.setEndpoint("136*****587");
+
+        final SmsPublishMessage message2 = new SmsPublishMessage();
+        message2.setMessage("【华为企业云】您的验证码是:123456，请查收");
+        message2.setEndpoint("13****587");
+        // MessageIncludeSignFlag为true时，可以不传SignId, 但是内容中必须包含签名,如【华为云】您的验证码是:1234，请查收。签名以【】括起来放在内容头部或者尾部
+        message2.setMessageIncludeSignFlag(true);
+
+        List<SmsPublishMessage> list = new ArrayList<SmsPublishMessage>() {{
+            add(message1);
+            add(message2);
+        }};
+
+        SmsBatchPublishWithDiffMessageRequest request = new SmsBatchPublishWithDiffMessageRequest();
+        request.setSmsMessages(list);
+        try {
+            SmsBatchPublishWithDiffMessageResponse response = smnClient.sendRequest(request);
+            if (response.isSuccess()) {
+                List<BatchPublishSmsMessageResult> results = response.getResult();
+                for (BatchPublishSmsMessageResult result : results) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("messageId='").append(result.getMessageId()).append('\'');
+                    sb.append(", endpoint='").append(result.getEndpoint()).append('\'');
+                    sb.append(", code='").append(result.getCode()).append('\'');
+                    sb.append(", message='").append(result.getMessage()).append('\'');
+                    sb.append('}');
+                    System.out.println(sb);
+                }
+            } else {
+                System.out.println("httpCode:" + response.getHttpCode()
+                        + ", request_id:" + response.getRequestId()
+                        + ", errormessage:" + response.getMessage());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * 批量发送推广类短信
      */
     public static void promotionSmsPublish(SmnClient smnClient) {
@@ -118,6 +168,8 @@ public class SmsDemo {
         List<String> endpoints = new ArrayList<String>();
         endpoints.add("8613688807587");
 
+        // 设置参数
+        // MessageIncludeSignFlag为true时，可以不传SignId, 但是内容中必须包含签名,如【华为云】您的验证码是:1234，请查收。签名以【】括起来放在内容头部或者尾部
         smnRequest.setSignId("47f86cf7c9a7449d98ee61cf193a1060")
                 .setSmsTemplateId("bfda25c6406e42ddabad74b4a20f6d05")
                 .setEndpoints(endpoints);
@@ -125,7 +177,7 @@ public class SmsDemo {
         // 发送短信
         try {
             PromotionSmsPublishResponse res = smnClient.sendRequest(smnRequest);
-            
+
             System.out.println("httpCode:" + res.getHttpCode()
                     + ", request_id:" + res.getRequestId()
                     + ", errormessage:" + res.getMessage());
@@ -155,12 +207,14 @@ public class SmsDemo {
 
         // 设置参数
         List<String> endpoints = new ArrayList<String>();
-        endpoints.add("8613****7587");
+        endpoints.add("86136****587");
         endpoints.add("1598****83");
 
-        smnRequest.setSignId("6be340e91e5241e4b5d85837e6709104")
-                .setMessage("您的验证码是:1234，请查收")
-                .setEndpoints(endpoints);
+        // MessageIncludeSignFlag为true时，可以不传SignId, 但是内容中必须包含签名,如【华为云】您的验证码是:1234，请查收。签名以【】括起来放在内容头部或者尾部
+        smnRequest.setMessage("您的验证码是:1234，请查收")
+                .setSignId("6be340e91e5241e4b5d85837e6709104")
+                .setEndpoints(endpoints)
+                .setMessageIncludeSignFlag(false);
 
         // 发送短信
         try {
