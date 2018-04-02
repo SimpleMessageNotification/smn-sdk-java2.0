@@ -10,33 +10,34 @@
  * Apache License, Version 2.0 for more details.
  */
 
-package com.smn.response.sms;
+package com.smn.request.sms;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * batch publish Notifications and verification code SMS result entity
- *
- * @author zhangyx
- * @version 2.0.2
- */
-public class BatchPublishSmsMessageResult {
-    @JsonProperty("message_id")
-    private String messageId;
+public class SmsPublishMessage {
+    /**
+     * message access point
+     */
     @JsonProperty("endpoint")
     private String endpoint;
-    @JsonProperty("code")
-    private String code;
+
+    /**
+     * message to send
+     */
     @JsonProperty("message")
     private String message;
 
-    public String getMessageId() {
-        return messageId;
-    }
+    /**
+     * message signature id
+     */
+    @JsonProperty("sign_id")
+    private String signId;
 
-    public void setMessageId(String messageId) {
-        this.messageId = messageId;
-    }
+    /**
+     * message_include_sign_flag
+     */
+    @JsonProperty("message_include_sign_flag")
+    private boolean messageIncludeSignFlag = false;
 
     public String getEndpoint() {
         return endpoint;
@@ -44,14 +45,6 @@ public class BatchPublishSmsMessageResult {
 
     public void setEndpoint(String endpoint) {
         this.endpoint = endpoint;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getMessage() {
@@ -62,4 +55,19 @@ public class BatchPublishSmsMessageResult {
         this.message = message;
     }
 
+    public String getSignId() {
+        return signId;
+    }
+
+    public void setSignId(String signId) {
+        this.signId = signId;
+    }
+
+    public boolean isMessageIncludeSignFlag() {
+        return messageIncludeSignFlag;
+    }
+
+    public void setMessageIncludeSignFlag(boolean messageIncludeSignFlag) {
+        this.messageIncludeSignFlag = messageIncludeSignFlag;
+    }
 }

@@ -16,6 +16,7 @@ import com.smn.http.HttpMethod;
 import com.smn.request.AbstractRequest;
 import com.smn.response.sms.SmsPublishResponse;
 import com.smn.util.StringUtil;
+import com.smn.util.ValidationUtil;
 
 /**
  * publish sms direct
@@ -40,6 +41,11 @@ public class SmsPublishRequest extends AbstractRequest<SmsPublishResponse> {
      */
     private String signId;
 
+    /**
+     * message_include_sign_flag
+     */
+    private boolean messageIncludeSignFlag = false;
+
     public HttpMethod getHttpMethod() {
         return HttpMethod.POST;
     }
@@ -53,8 +59,12 @@ public class SmsPublishRequest extends AbstractRequest<SmsPublishResponse> {
             throw new NullPointerException("message is null.");
         }
 
-        if (StringUtil.isEmpty(signId)) {
+        if (!messageIncludeSignFlag && StringUtil.isEmpty(signId)) {
             throw new NullPointerException("sign id is null.");
+        }
+
+        if (StringUtil.isEmpty(signId) && messageIncludeSignFlag && !ValidationUtil.containSignNameFromMessage(message)) {
+            throw new NullPointerException("message not include sign.");
         }
 
         StringBuilder sb = new StringBuilder();
@@ -79,6 +89,10 @@ public class SmsPublishRequest extends AbstractRequest<SmsPublishResponse> {
         return signId;
     }
 
+    public boolean isMessageIncludeSignFlag() {
+        return messageIncludeSignFlag;
+    }
+
     public SmsPublishRequest setEndpoint(String endpoint) {
         this.endpoint = endpoint;
         this.bodyMap.put("endpoint", endpoint);
@@ -94,6 +108,12 @@ public class SmsPublishRequest extends AbstractRequest<SmsPublishResponse> {
     public SmsPublishRequest setSignId(String signId) {
         this.signId = signId;
         this.bodyMap.put("sign_id", signId);
+        return this;
+    }
+
+    public SmsPublishRequest setMessageIncludeSignFlag(boolean messageIncludeSignFlag) {
+        this.messageIncludeSignFlag = messageIncludeSignFlag;
+        this.bodyMap.put("message_include_sign_flag", messageIncludeSignFlag);
         return this;
     }
 }

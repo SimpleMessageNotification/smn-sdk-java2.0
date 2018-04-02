@@ -17,6 +17,7 @@ import com.smn.http.HttpMethod;
 import com.smn.request.AbstractRequest;
 import com.smn.response.sms.BatchPublishSmsMessageResponse;
 import com.smn.util.StringUtil;
+import com.smn.util.ValidationUtil;
 
 import java.util.List;
 
@@ -40,6 +41,11 @@ public class BatchPublishSmsMessageRequest extends AbstractRequest<BatchPublishS
      */
     private List<String> endpoints;
 
+    /**
+     * message_include_sign_flag
+     */
+    private boolean messageIncludeSignFlag = false;
+
     @Override
     public HttpMethod getHttpMethod() {
         return HttpMethod.POST;
@@ -55,8 +61,12 @@ public class BatchPublishSmsMessageRequest extends AbstractRequest<BatchPublishS
             throw new NullPointerException("endpoints is null or empty.");
         }
 
-        if (StringUtil.isEmpty(signId)) {
+        if (!messageIncludeSignFlag && StringUtil.isEmpty(signId)) {
             throw new NullPointerException("sign id is null.");
+        }
+
+        if (StringUtil.isEmpty(signId) && messageIncludeSignFlag && !ValidationUtil.containSignNameFromMessage(message)) {
+            throw new NullPointerException("message not include sign.");
         }
 
         StringBuilder sb = new StringBuilder();
@@ -85,6 +95,12 @@ public class BatchPublishSmsMessageRequest extends AbstractRequest<BatchPublishS
         return this;
     }
 
+    public BatchPublishSmsMessageRequest setMessageIncludeSignFlag(boolean messageIncludeSignFlag) {
+        this.messageIncludeSignFlag = messageIncludeSignFlag;
+        this.bodyMap.put("message_include_sign_flag", messageIncludeSignFlag);
+        return this;
+    }
+
     public String getMessage() {
         return message;
     }
@@ -95,5 +111,9 @@ public class BatchPublishSmsMessageRequest extends AbstractRequest<BatchPublishS
 
     public List<String> getEndpoints() {
         return endpoints;
+    }
+
+    public boolean isMessageIncludeSignFlag() {
+        return messageIncludeSignFlag;
     }
 }
