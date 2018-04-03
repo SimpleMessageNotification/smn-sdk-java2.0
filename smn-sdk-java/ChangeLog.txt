@@ -9,3 +9,7 @@
 2018-03-15 version 2.0.2:
 1.Fix token cache
 2.Add batch send notifications and verification code SMS
+
+2018-04-03 version 2.0.3:
+1. SmsPublish and SmsBatchPublish add parameter message_include_sign_flag
+2. Add SmsBatchPublishWithDiffMessage

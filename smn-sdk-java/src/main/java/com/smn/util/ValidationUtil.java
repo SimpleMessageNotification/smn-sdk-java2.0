@@ -50,6 +50,10 @@ public class ValidationUtil {
 
     private final static int MAX_TOPIC_DISPLAY_NAME = 192;
     private final static int MAX_TEMPLATE_MESSAGE_CONTENT_LENGTH = 256 * 1024;
+    private final static int SIGN_MAX_LENGTH = 10;
+    private final static char SIGNLABEL_CH_LEFT = '【';
+    private final static char SIGNLABEL_CH_RIGHT = '】';
+    public final static int MAX_SMS_BATCH_PUBLISH_SIZE = 1000;
 
     /**
      * validate topic name if is conformed with specification
@@ -213,5 +217,38 @@ public class ValidationUtil {
             return false;
         }
         return PATTERN_SMS_TEMPLATE_NAME.matcher(templateName).matches();
+    }
+
+    /**
+     * validate message contain sign name
+     *
+     * @param message sms content
+     * @return if match return true, else return false
+     */
+    public static boolean containSignNameFromMessage(String message) {
+        if (StringUtil.isEmpty(message) || message.length() < 4) {
+            return false;
+        }
+        int scanLegth = message.length() > SIGN_MAX_LENGTH ? SIGN_MAX_LENGTH : message.length();
+
+        // scan head
+        if (message.charAt(0) == SIGNLABEL_CH_LEFT) {
+            for (int i = 1; i < scanLegth; i++) {
+                if (message.charAt(i) == SIGNLABEL_CH_RIGHT) {
+                    return true;
+                }
+            }
+        }
+
+        // scan tail
+        if (message.charAt(message.length() - 1) == SIGNLABEL_CH_RIGHT) {
+            for (int i = message.length() - 2; i > message.length() - scanLegth - 1; i--) {
+                if (message.charAt(i) == SIGNLABEL_CH_LEFT) {
+                    return true;
+                }
+            }
+        }
+        return false;
+
     }
 }
