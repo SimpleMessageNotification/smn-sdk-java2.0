@@ -42,6 +42,11 @@ public class AkskSigner {
     private String serviceName;
 
     /**
+     * signer
+     */
+    private DefaultSigner signer;
+
+    /**
      * constructor
      *
      * @param smnConfiguration smn config
@@ -50,6 +55,7 @@ public class AkskSigner {
     public AkskSigner(SmnConfiguration smnConfiguration, String serviceName) {
         this.smnConfiguration = smnConfiguration;
         this.serviceName = serviceName;
+        this.signer = new DefaultSigner();
     }
 
     /**
@@ -63,7 +69,7 @@ public class AkskSigner {
         Map<String, String> headers = this.getSignHeader(url, null, null, HttpMethod.GET);
 
         for (String key : headers.keySet()) {
-            if (key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH.toString())) {
+            if (key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH)) {
                 continue;
             }
             smnRequest.addHeader(key, headers.get(key));
@@ -81,7 +87,7 @@ public class AkskSigner {
         Map<String, String> headers = this.getSignHeader(url, null, null, HttpMethod.DELETE);
 
         for (String key : headers.keySet()) {
-            if (key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH.toString())) {
+            if (key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH)) {
                 continue;
             }
             smnRequest.addHeader(key, headers.get(key));
@@ -119,7 +125,7 @@ public class AkskSigner {
         InputStream content = new ByteArrayInputStream(postbody.getBytes());
         Map<String, String> headers = this.getSignHeader(url, null, content, HttpMethod.PUT);
         for (String key : headers.keySet()) {
-            if (key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH.toString())) {
+            if (key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH)) {
                 continue;
             }
             smnRequest.addHeader(key, headers.get(key));
@@ -172,7 +178,6 @@ public class AkskSigner {
         // Select an algorithm for request signing.
         //com.cloud.sdk.auth.signer.Signer signer = SignerFactory.getSigner(serviceName, smnConfiguration.getRegionName());
         // Sign the request, and the request will change after the signing.
-        DefaultSigner signer = new DefaultSigner();
         signer.sign(smnConfiguration.getRegionName(), serviceName, request, smnConfiguration.getSecretAccessKey(), smnConfiguration.getAccessKeyId());
 
         // Make a request that can be sent by the HTTP client.
@@ -180,7 +185,7 @@ public class AkskSigner {
         Map<String, String> requestHeaders = request.getHeaders();
         // Put the header of the signed request to the new request.
         for (String key : requestHeaders.keySet()) {
-            if (key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH.toString())) {
+            if (key.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH)) {
                 continue;
             }
             map.put(key, requestHeaders.get(key));

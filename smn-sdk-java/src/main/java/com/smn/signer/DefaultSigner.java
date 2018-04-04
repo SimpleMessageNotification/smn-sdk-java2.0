@@ -17,45 +17,52 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * default aksk signature tool
+ */
 public class DefaultSigner {
-    public static final Charset UTF8 = Charset.forName("UTF-8");
-    private static final Pattern ENCODED_CHARACTERS_PATTERN;
     protected boolean doubleUrlEncode = true;
-
-    static {
-        StringBuilder pattern = new StringBuilder();
-        pattern.append(Pattern.quote("+")).append("|").append(Pattern.quote("*")).append("|").append(Pattern.quote("%7E")).append("|").append(Pattern.quote("%2F"));
-        ENCODED_CHARACTERS_PATTERN = Pattern.compile(pattern.toString());
-    }
+    private static final FIFOCache<SignerKey> signerCache = new FIFOCache(300);
 
     public void sign(String regionName, String serviceName, SignerRequest request, String secretKey, String accessKeyId) {
         SignerParams signerParams = new SignerParams(regionName, serviceName, "SDK-HMAC-SHA256");
         addHostHeader(request);
-        request.addHeader("X-Sdk-Date", signerParams.getFormattedSigningDateTime());
+        addSdkDateHeader(request, signerParams);
         String contentSha256 = this.calculateContentHash(request);
-        if ("required".equals(request.getHeaders().get("x-sdk-content-sha256"))) {
-            request.addHeader("x-sdk-content-sha256", contentSha256);
-        }
         String canonicalRequest = this.createCanonicalRequest(request, contentSha256);
         String stringToSign = this.createStringToSign(canonicalRequest, signerParams);
         byte[] signingKey = this.deriveSigningKey(signerParams, secretKey);
         byte[] signature = this.computeSignature(stringToSign, signingKey);
         request.addHeader("Authorization", this.buildAuthorizationHeader(request, signature, accessKeyId, signerParams));
+    }
+
+    private void addHostHeader(SignerRequest request) {
+        StringBuilder hostHeaderBuilder = new StringBuilder(request.getEndpoint().getHost());
+        if (SignerUtil.isUsingNonDefaultPort(request.getEndpoint())) {
+            hostHeaderBuilder.append(":").append(request.getEndpoint().getPort());
+        }
+
+        request.addHeader("Host", hostHeaderBuilder.toString());
+    }
+
+    private void addSdkDateHeader(SignerRequest request, SignerParams signerParams) {
+        request.addHeader("X-Sdk-Date", signerParams.getFormattedSigningDateTime());
     }
 
     private String buildAuthorizationHeader(SignerRequest request, byte[] signature, String accessKeyId, SignerParams signerParams) {
@@ -68,49 +75,38 @@ public class DefaultSigner {
         return authHeaderBuilder.toString();
     }
 
-    protected final byte[] computeSignature(String stringToSign, byte[] signingKey) {
-        return this.sign(stringToSign.getBytes(UTF8), signingKey, SigningAlgorithm.HmacSHA256);
+    private byte[] computeSignature(String stringToSign, byte[] signingKey) {
+        return SignerUtil.sign(stringToSign.getBytes(SignerUtil.UTF8), signingKey, SigningAlgorithm.HmacSHA256);
     }
 
-    protected String createStringToSign(String canonicalRequest, SignerParams signerParams) {
-        StringBuilder stringToSignBuilder = new StringBuilder(signerParams.getSigningAlgorithm());
-        stringToSignBuilder.append("\n").append(signerParams.getFormattedSigningDateTime()).append("\n").append(signerParams.getScope()).append("\n").append(BinaryUtils.toHex(this.hash(canonicalRequest)));
-        String stringToSign = stringToSignBuilder.toString();
-        return stringToSign;
+    private String createStringToSign(String canonicalRequest, SignerParams signerParams) {
+        StringBuilder stringToSignBuilder = new StringBuilder();
+        stringToSignBuilder.append(signerParams.getSigningAlgorithm()).append("\n")
+                .append(signerParams.getFormattedSigningDateTime()).append("\n")
+                .append(signerParams.getScope()).append("\n")
+                .append(BinaryUtils.toHex(SignerUtil.hash(canonicalRequest)));
+        return stringToSignBuilder.toString();
     }
 
     private final byte[] deriveSigningKey(SignerParams signerRequestParams, String secretKey) {
-        //  String cacheKey = this.computeSigningCacheKeyName(secretKey, signerRequestParams);
-        //  long daysSinceEpochSigningDate = SignerUtil.numberOfDaysSinceEpoch(signerRequestParams.getSigningDateTimeMilli());
-        byte[] signingKey = this.newSigningKey(secretKey, signerRequestParams.getFormattedSigningDate(), signerRequestParams.getRegionName(), signerRequestParams.getServiceName());
-        return signingKey;
+        String cacheKey = this.computeSigningCacheKeyName(secretKey, signerRequestParams);
+        long daysSinceEpochSigningDate = SignerUtil.numberOfDaysSinceEpoch(signerRequestParams.getSigningDateTimeMilli());
+        SignerKey signerKey = signerCache.get(cacheKey);
+        if (signerKey != null && daysSinceEpochSigningDate == signerKey.getNumberOfDaysSinceEpoch()) {
+            return signerKey.getSigningKey();
+        } else {
+            byte[] signingKey = this.newSigningKey(secretKey, signerRequestParams.getFormattedSigningDate(), signerRequestParams.getRegionName(), signerRequestParams.getServiceName());
+            signerCache.add(cacheKey, new SignerKey(daysSinceEpochSigningDate, signingKey));
+            return signingKey;
+        }
     }
 
     private byte[] newSigningKey(String secretKey, String dateStamp, String regionName, String serviceName) {
-        byte[] kSecret = ("SDK" + secretKey).getBytes(UTF8);
-        byte[] kDate = this.sign(dateStamp, kSecret, SigningAlgorithm.HmacSHA256);
-        byte[] kRegion = this.sign(regionName, kDate, SigningAlgorithm.HmacSHA256);
-        byte[] kService = this.sign(serviceName, kRegion, SigningAlgorithm.HmacSHA256);
-        return this.sign("sdk_request", kService, SigningAlgorithm.HmacSHA256);
-    }
-
-    public byte[] sign(String stringData, byte[] key, SigningAlgorithm algorithm) {
-        try {
-            byte[] data = stringData.getBytes(UTF8);
-            return this.sign(data, key, algorithm);
-        } catch (Exception var5) {
-            throw new RuntimeException("Unable to calculate a request signature: " + var5.getMessage(), var5);
-        }
-    }
-
-    protected byte[] sign(byte[] data, byte[] key, SigningAlgorithm algorithm) {
-        try {
-            Mac mac = Mac.getInstance(algorithm.toString());
-            mac.init(new SecretKeySpec(key, algorithm.toString()));
-            return mac.doFinal(data);
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to calculate a request signature: " + e.getMessage(), e);
-        }
+        byte[] kSecret = ("SDK" + secretKey).getBytes(SignerUtil.UTF8);
+        byte[] kDate = SignerUtil.sign(dateStamp, kSecret, SigningAlgorithm.HmacSHA256);
+        byte[] kRegion = SignerUtil.sign(regionName, kDate, SigningAlgorithm.HmacSHA256);
+        byte[] kService = SignerUtil.sign(serviceName, kRegion, SigningAlgorithm.HmacSHA256);
+        return SignerUtil.sign("sdk_request", kService, SigningAlgorithm.HmacSHA256);
     }
 
     private final String computeSigningCacheKeyName(String secretKey, SignerParams signerRequestParams) {
@@ -122,21 +118,23 @@ public class DefaultSigner {
                 .toString();
     }
 
-    protected String createCanonicalRequest(SignerRequest request, String contentSha256) {
+    private String createCanonicalRequest(SignerRequest request, String contentSha256) {
         String path = appendUri(request.getEndpoint().getPath(), request.getResourcePath());
-        StringBuilder canonicalRequestBuilder = new StringBuilder(request.getHttpMethod().toString());
-        canonicalRequestBuilder.append("\n").append(this.getCanonicalizedResourcePath(path, this.doubleUrlEncode)).append("\n").append(this.getCanonicalizedQueryString(request)).append("\n")
-                .append(this.getCanonicalizedHeaderString(request))
-                .append("\n").append(this.getSignedHeadersString(request)).append("\n").append(contentSha256);
-        String canonicalRequest = canonicalRequestBuilder.toString();
-        return canonicalRequest;
+        StringBuilder canonicalRequestBuilder = new StringBuilder();
+        canonicalRequestBuilder.append(request.getHttpMethod().toString()).append("\n")
+                .append(this.getCanonicalizedResourcePath(path, this.doubleUrlEncode)).append("\n")
+                .append(this.getCanonicalizedQueryString(request)).append("\n")
+                .append(this.getCanonicalizedHeaderString(request)).append("\n")
+                .append(this.getSignedHeadersString(request)).append("\n")
+                .append(contentSha256);
+        return canonicalRequestBuilder.toString();
     }
 
-    public static String appendUri(String baseUri, String path) {
+    private String appendUri(String baseUri, String path) {
         return appendUri(baseUri, path, false);
     }
 
-    public static String appendUri(String baseUri, String path, boolean escapeDoubleSlash) {
+    private String appendUri(String baseUri, String path, boolean escapeDoubleSlash) {
         String resultUri = baseUri;
         if (path != null && path.length() > 0) {
             if (path.startsWith("/")) {
@@ -160,14 +158,14 @@ public class DefaultSigner {
         return resultUri;
     }
 
-    protected String getCanonicalizedHeaderString(SignerRequest request) {
+    private String getCanonicalizedHeaderString(SignerRequest request) {
         List<String> sortedHeaders = new ArrayList(request.getHeaders().keySet());
         Collections.sort(sortedHeaders, String.CASE_INSENSITIVE_ORDER);
         Map<String, String> requestHeaders = request.getHeaders();
         StringBuilder buffer = new StringBuilder();
 
-        for (Iterator var5 = sortedHeaders.iterator(); var5.hasNext(); buffer.append("\n")) {
-            String header = (String) var5.next();
+        for (Iterator iterator = sortedHeaders.iterator(); iterator.hasNext(); buffer.append("\n")) {
+            String header = (String) iterator.next();
             String key = header.toLowerCase().replaceAll("\\s+", " ");
             String value = requestHeaders.get(header);
             buffer.append(key).append(":");
@@ -179,14 +177,14 @@ public class DefaultSigner {
         return buffer.toString();
     }
 
-    protected String getSignedHeadersString(SignerRequest request) {
+    private String getSignedHeadersString(SignerRequest request) {
         List<String> sortedHeaders = new ArrayList(request.getHeaders().keySet());
         Collections.sort(sortedHeaders, String.CASE_INSENSITIVE_ORDER);
         StringBuilder buffer = new StringBuilder();
 
         String header;
-        for (Iterator var4 = sortedHeaders.iterator(); var4.hasNext(); buffer.append(header.toLowerCase())) {
-            header = (String) var4.next();
+        for (Iterator iterator = sortedHeaders.iterator(); iterator.hasNext(); buffer.append(header.toLowerCase())) {
+            header = (String) iterator.next();
             if (buffer.length() > 0) {
                 buffer.append(";");
             }
@@ -195,11 +193,11 @@ public class DefaultSigner {
         return buffer.toString();
     }
 
-    protected String getCanonicalizedQueryString(SignerRequest request) {
-        return usePayloadForQueryParameters(request) ? "" : this.getCanonicalizedQueryString(request.getParameters());
+    private String getCanonicalizedQueryString(SignerRequest request) {
+        return usePayloadForQueryParameters(request) ? "" : getCanonicalizedQueryString(request.getParameters());
     }
 
-    protected String getCanonicalizedQueryString(Map<String, String> parameters) {
+    private String getCanonicalizedQueryString(Map<String, String> parameters) {
         SortedMap<String, String> sorted = new TreeMap();
         Iterator pairs = parameters.entrySet().iterator();
 
@@ -226,7 +224,7 @@ public class DefaultSigner {
         return builder.toString();
     }
 
-    protected String getCanonicalizedResourcePath(String resourcePath, boolean urlEncode) {
+    private String getCanonicalizedResourcePath(String resourcePath, boolean urlEncode) {
         if (resourcePath != null && !resourcePath.isEmpty()) {
             String value = urlEncode ? urlEncode(resourcePath, true) : resourcePath;
             return value.startsWith("/") ? value : "/".concat(value);
@@ -235,13 +233,13 @@ public class DefaultSigner {
         }
     }
 
-    public static String urlEncode(String value, boolean path) {
+    private String urlEncode(String value, boolean path) {
         if (value == null) {
             return "";
         } else {
             try {
                 String encoded = URLEncoder.encode(value, "UTF-8");
-                Matcher matcher = ENCODED_CHARACTERS_PATTERN.matcher(encoded);
+                Matcher matcher = SignerUtil.ENCODED_CHARACTERS_PATTERN.matcher(encoded);
 
                 StringBuffer buffer;
                 String replacement;
@@ -266,50 +264,44 @@ public class DefaultSigner {
         }
     }
 
-    private void addHostHeader(SignerRequest request) {
-        StringBuilder hostHeaderBuilder = new StringBuilder(request.getEndpoint().getHost());
-        if (isUsingNonDefaultPort(request.getEndpoint())) {
-            hostHeaderBuilder.append(":").append(request.getEndpoint().getPort());
-        }
-
-        request.addHeader("Host", hostHeaderBuilder.toString());
-    }
-
-    private static boolean isUsingNonDefaultPort(URI uri) {
-        String scheme = uri.getScheme().toLowerCase();
-        int port = uri.getPort();
-        if (port <= 0) {
-            return false;
-        } else if (scheme.equals("http") && port == 80) {
-            return false;
-        } else {
-            return !scheme.equals("https") || port != 443;
-        }
-    }
-
     private String calculateContentHash(SignerRequest request) {
         InputStream payloadStream = this.getBinaryRequestPayloadStream(request);
         payloadStream.mark(request.getReadLimit());
-        String contentSha256 = BinaryUtils.toHex(this.hash(payloadStream));
+        String contentSha256 = BinaryUtils.toHex(SignerUtil.hash(payloadStream));
 
         try {
             payloadStream.reset();
-            return contentSha256;
         } catch (IOException e) {
             throw new RuntimeException("Unable to reset stream after calculating signature", e);
         }
+        return contentSha256;
     }
 
-    protected InputStream getBinaryRequestPayloadStream(SignerRequest request) {
+    private InputStream getBinaryRequestPayloadStream(SignerRequest request) {
         if (usePayloadForQueryParameters(request)) {
             String encodedParameters = encodeParameters(request);
-            return encodedParameters == null ? new ByteArrayInputStream(new byte[0]) : new ByteArrayInputStream(encodedParameters.getBytes(UTF8));
+            return encodedParameters == null ? new ByteArrayInputStream(new byte[0]) : new ByteArrayInputStream(encodedParameters.getBytes(SignerUtil.UTF8));
         } else {
-            return this.getBinaryRequestPayloadStreamWithoutQueryParams(request);
+            return getBinaryRequestPayloadStreamWithoutQueryParams(request);
         }
     }
 
-    public static String encodeParameters(SignerRequest request) {
+    private InputStream getBinaryRequestPayloadStreamWithoutQueryParams(SignerRequest request) {
+        try {
+            InputStream is = request.getContent();
+            if (is == null) {
+                return new ByteArrayInputStream(new byte[0]);
+            } else if (!is.markSupported()) {
+                throw new RuntimeException("Unable to read request payload to sign request.");
+            } else {
+                return is;
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to read request payload to sign request: " + e.getMessage(), e);
+        }
+    }
+
+    private String encodeParameters(SignerRequest request) {
         List<NameValuePair> nameValuePairs = null;
         int size = request.getParameters().size();
         if (size > 0) {
@@ -319,7 +311,7 @@ public class DefaultSigner {
                 public int compare(Object arg1, Object arg2) {
                     Map.Entry<String, String> obj1 = (Map.Entry) arg1;
                     Map.Entry<String, String> obj2 = (Map.Entry) arg2;
-                    return (obj1.getKey()).toString().compareTo(obj2.getKey());
+                    return (obj1.getKey()).compareTo(obj2.getKey());
                 }
             });
             Iterator iterator = parameters.iterator();
@@ -339,49 +331,8 @@ public class DefaultSigner {
     }
 
 
-    public boolean usePayloadForQueryParameters(SignerRequest request) {
+    private boolean usePayloadForQueryParameters(SignerRequest request) {
         return HttpMethod.POST.equals(request.getHttpMethod()) && (request.getContent() == null);
-    }
-
-    protected InputStream getBinaryRequestPayloadStreamWithoutQueryParams(SignerRequest request) {
-        try {
-            InputStream is = request.getContent();
-            if (is == null) {
-                return new ByteArrayInputStream(new byte[0]);
-            } else if (!is.markSupported()) {
-                throw new RuntimeException("Unable to read request payload to sign request.");
-            } else {
-                return is;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to read request payload to sign request: " + e.getMessage(), e);
-        }
-    }
-
-    public byte[] hash(String text) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(text.getBytes(UTF8));
-            return md.digest();
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to compute hash while signing request: " + e.getMessage(), e);
-        }
-    }
-
-    protected byte[] hash(InputStream input) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            DigestInputStream digestInputStream = new SdkDigestInputStream(input, md);
-            byte[] buffer = new byte[1024];
-
-            while (digestInputStream.read(buffer) > -1) {
-
-            }
-
-            return digestInputStream.getMessageDigest().digest();
-        } catch (Exception e) {
-            throw new RuntimeException("Unable to compute hash while signing request: " + e.getMessage(), e);
-        }
     }
 }
 
