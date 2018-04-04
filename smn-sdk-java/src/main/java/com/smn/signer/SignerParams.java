@@ -12,6 +12,14 @@
 
 package com.smn.signer;
 
+import com.smn.signer.Util.SignerConstantsUtil;
+import com.smn.signer.Util.SignerUtil;
+
+/**
+ * the params for Signer
+ *
+ * @version 2.0.4
+ */
 public class SignerParams {
     private String formattedSigningDate;
     private String formattedSigningDateTime;
@@ -37,7 +45,10 @@ public class SignerParams {
 
     private String generateScope(String dateStamp, String serviceName, String regionName) {
         StringBuilder scopeBuilder = new StringBuilder();
-        return scopeBuilder.append(dateStamp).append("/").append(regionName).append("/").append(serviceName).append("/").append("sdk_request").toString();
+        return scopeBuilder.append(dateStamp).append("/")
+                .append(regionName).append("/")
+                .append(serviceName).append("/")
+                .append(SignerConstantsUtil.SDK_TERMINATOR).toString();
     }
 
     public String getFormattedSigningDate() {

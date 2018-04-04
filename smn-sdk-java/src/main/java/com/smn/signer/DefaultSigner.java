@@ -13,6 +13,8 @@
 package com.smn.signer;
 
 import com.smn.http.HttpMethod;
+import com.smn.signer.Util.*;
+import com.smn.signer.cache.FIFOCache;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
@@ -20,28 +22,19 @@ import org.apache.http.message.BasicNameValuePair;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  * default aksk signature tool
+ *
+ * @version 2.0.4
  */
 public class DefaultSigner {
     protected boolean doubleUrlEncode = true;
-    private static final FIFOCache<SignerKey> signerCache = new FIFOCache(300);
+    private static final FIFOCache<SignerKey> signerCache = new FIFOCache(SignerConstantsUtil.MAX_CACHE_SIZE);
 
     public void sign(String regionName, String serviceName, SignerRequest request, String secretKey, String accessKeyId) {
-        SignerParams signerParams = new SignerParams(regionName, serviceName, "SDK-HMAC-SHA256");
+        SignerParams signerParams = new SignerParams(regionName, serviceName, SignerConstantsUtil.SDK_SIGNING_ALGORITHM);
         addHostHeader(request);
         addSdkDateHeader(request, signerParams);
         String contentSha256 = this.calculateContentHash(request);
@@ -49,7 +42,7 @@ public class DefaultSigner {
         String stringToSign = this.createStringToSign(canonicalRequest, signerParams);
         byte[] signingKey = this.deriveSigningKey(signerParams, secretKey);
         byte[] signature = this.computeSignature(stringToSign, signingKey);
-        request.addHeader("Authorization", this.buildAuthorizationHeader(request, signature, accessKeyId, signerParams));
+        request.addHeader(SignerConstantsUtil.AUTHORIZATION, this.buildAuthorizationHeader(request, signature, accessKeyId, signerParams));
     }
 
     private void addHostHeader(SignerRequest request) {
@@ -58,11 +51,11 @@ public class DefaultSigner {
             hostHeaderBuilder.append(":").append(request.getEndpoint().getPort());
         }
 
-        request.addHeader("Host", hostHeaderBuilder.toString());
+        request.addHeader(SignerConstantsUtil.HOST, hostHeaderBuilder.toString());
     }
 
     private void addSdkDateHeader(SignerRequest request, SignerParams signerParams) {
-        request.addHeader("X-Sdk-Date", signerParams.getFormattedSigningDateTime());
+        request.addHeader(SignerConstantsUtil.X_SDK_DATE, signerParams.getFormattedSigningDateTime());
     }
 
     private String buildAuthorizationHeader(SignerRequest request, byte[] signature, String accessKeyId, SignerParams signerParams) {
@@ -71,7 +64,10 @@ public class DefaultSigner {
         String signerHeaders = "SignedHeaders=" + this.getSignedHeadersString(request);
         String signatureHeader = "Signature=" + BinaryUtils.toHex(signature);
         StringBuilder authHeaderBuilder = new StringBuilder();
-        authHeaderBuilder.append("SDK-HMAC-SHA256").append(" ").append(credential).append(", ").append(signerHeaders).append(", ").append(signatureHeader);
+        authHeaderBuilder.append(SignerConstantsUtil.SDK_SIGNING_ALGORITHM).append(" ")
+                .append(credential).append(", ")
+                .append(signerHeaders).append(", ")
+                .append(signatureHeader);
         return authHeaderBuilder.toString();
     }
 
@@ -81,9 +77,9 @@ public class DefaultSigner {
 
     private String createStringToSign(String canonicalRequest, SignerParams signerParams) {
         StringBuilder stringToSignBuilder = new StringBuilder();
-        stringToSignBuilder.append(signerParams.getSigningAlgorithm()).append("\n")
-                .append(signerParams.getFormattedSigningDateTime()).append("\n")
-                .append(signerParams.getScope()).append("\n")
+        stringToSignBuilder.append(signerParams.getSigningAlgorithm()).append(SignerConstantsUtil.LINE_SEPARATOR)
+                .append(signerParams.getFormattedSigningDateTime()).append(SignerConstantsUtil.LINE_SEPARATOR)
+                .append(signerParams.getScope()).append(SignerConstantsUtil.LINE_SEPARATOR)
                 .append(BinaryUtils.toHex(SignerUtil.hash(canonicalRequest)));
         return stringToSignBuilder.toString();
     }
@@ -102,11 +98,11 @@ public class DefaultSigner {
     }
 
     private byte[] newSigningKey(String secretKey, String dateStamp, String regionName, String serviceName) {
-        byte[] kSecret = ("SDK" + secretKey).getBytes(SignerUtil.UTF8);
+        byte[] kSecret = (SignerConstantsUtil.SDK_NAME + secretKey).getBytes(SignerUtil.UTF8);
         byte[] kDate = SignerUtil.sign(dateStamp, kSecret, SigningAlgorithm.HmacSHA256);
         byte[] kRegion = SignerUtil.sign(regionName, kDate, SigningAlgorithm.HmacSHA256);
         byte[] kService = SignerUtil.sign(serviceName, kRegion, SigningAlgorithm.HmacSHA256);
-        return SignerUtil.sign("sdk_request", kService, SigningAlgorithm.HmacSHA256);
+        return SignerUtil.sign(SignerConstantsUtil.SDK_TERMINATOR, kService, SigningAlgorithm.HmacSHA256);
     }
 
     private final String computeSigningCacheKeyName(String secretKey, SignerParams signerRequestParams) {
@@ -145,7 +141,7 @@ public class DefaultSigner {
                 resultUri = baseUri + "/";
             }
 
-            String encodedPath = urlEncode(path, true);
+            String encodedPath = SignerUtil.urlEncode(path, true);
             if (escapeDoubleSlash) {
                 encodedPath = encodedPath.replace("//", "/%2F");
             }
@@ -205,7 +201,7 @@ public class DefaultSigner {
             Map.Entry<String, String> pair = (Map.Entry) pairs.next();
             String key = pair.getKey();
             String value = pair.getValue();
-            sorted.put(urlEncode(key, false), urlEncode(value, false));
+            sorted.put(SignerUtil.urlEncode(key, false), SignerUtil.urlEncode(value, false));
         }
 
         StringBuilder builder = new StringBuilder();
@@ -226,41 +222,10 @@ public class DefaultSigner {
 
     private String getCanonicalizedResourcePath(String resourcePath, boolean urlEncode) {
         if (resourcePath != null && !resourcePath.isEmpty()) {
-            String value = urlEncode ? urlEncode(resourcePath, true) : resourcePath;
+            String value = urlEncode ? SignerUtil.urlEncode(resourcePath, true) : resourcePath;
             return value.startsWith("/") ? value : "/".concat(value);
         } else {
             return "/";
-        }
-    }
-
-    private String urlEncode(String value, boolean path) {
-        if (value == null) {
-            return "";
-        } else {
-            try {
-                String encoded = URLEncoder.encode(value, "UTF-8");
-                Matcher matcher = SignerUtil.ENCODED_CHARACTERS_PATTERN.matcher(encoded);
-
-                StringBuffer buffer;
-                String replacement;
-                for (buffer = new StringBuffer(encoded.length()); matcher.find(); matcher.appendReplacement(buffer, replacement)) {
-                    replacement = matcher.group(0);
-                    if ("+".equals(replacement)) {
-                        replacement = "%20";
-                    } else if ("*".equals(replacement)) {
-                        replacement = "%2A";
-                    } else if ("%7E".equals(replacement)) {
-                        replacement = "~";
-                    } else if (path && "%2F".equals(replacement)) {
-                        replacement = "/";
-                    }
-                }
-
-                matcher.appendTail(buffer);
-                return buffer.toString();
-            } catch (UnsupportedEncodingException var6) {
-                throw new RuntimeException(var6);
-            }
         }
     }
 
@@ -324,12 +289,11 @@ public class DefaultSigner {
 
         String encodedParams = null;
         if (nameValuePairs != null) {
-            encodedParams = URLEncodedUtils.format(nameValuePairs, "UTF-8");
+            encodedParams = URLEncodedUtils.format(nameValuePairs, SignerConstantsUtil.DEFAULT_ENCODING);
         }
 
         return encodedParams;
     }
-
 
     private boolean usePayloadForQueryParameters(SignerRequest request) {
         return HttpMethod.POST.equals(request.getHttpMethod()) && (request.getContent() == null);

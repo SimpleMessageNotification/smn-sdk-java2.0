@@ -17,6 +17,11 @@ import java.io.InputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
+/**
+ * sdk digest inputStream, extends {@link DigestInputStream}.
+ *
+ * @version 2.0.4
+ */
 public class SdkDigestInputStream extends DigestInputStream {
 
     public SdkDigestInputStream(InputStream stream, MessageDigest digest) {

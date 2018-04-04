@@ -10,8 +10,13 @@
  * Apache License, Version 2.0 for more details.
  */
 
-package com.smn.signer;
+package com.smn.signer.Util;
 
+/**
+ * Signing Algorithm, default HmacSHA256
+ *
+ * @version 2.0.4
+ */
 public enum SigningAlgorithm {
     HmacSHA256;
 

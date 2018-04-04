@@ -24,18 +24,6 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/cloud-java-sdk-smn-2.0.2.jar</systemPath>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>com.huawei.apigateway</groupId>-->
-            <!--<artifactId>java-sdk-core</artifactId>-->
-            <!--<version>${apigateway.version}</version>-->
-            <!--<scope>system</scope>-->
-            <!--<systemPath>${project.basedir}/lib/java-sdk-core-2.0.1.jar</systemPath>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>joda-time</groupId>-->
-            <!--<artifactId>joda-time</artifactId>-->
-            <!--<version>${joda-time.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>

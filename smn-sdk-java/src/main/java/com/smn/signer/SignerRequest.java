@@ -20,6 +20,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * signer request
+ *
+ * @author zhangyx
+ * @version 2.0.4
+ */
 public class SignerRequest {
 
     private String resourcePath;

@@ -10,7 +10,7 @@
  * Apache License, Version 2.0 for more details.
  */
 
-package com.smn.signer;
+package com.smn.signer.Util;
 
 import java.util.Locale;
 
