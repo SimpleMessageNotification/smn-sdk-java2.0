@@ -35,6 +35,9 @@ public class SmsSignInfo {
     @JsonProperty("status")
     private int status;
 
+    @JsonProperty("sign_type")
+    private int signType;
+
     public String getSignName() {
         return signName;
     }
@@ -73,5 +76,13 @@ public class SmsSignInfo {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public int getSignType() {
+        return signType;
+    }
+
+    public void setSignType(int signType) {
+        this.signType = signType;
     }
 }
