@@ -93,10 +93,10 @@ public class AkskSmnClient extends AbstractSmnClient {
         request.addHeader("X-Project-Id", projectId);
         request.addHeader("X-Smn-sdk", VersionUtil.getSdkVersion());
         request.addHeader("Content-Type", Constants.DEFAULT_CONTENT_TYPE);
+        HttpMethod httpMethod = request.getHttpMethod();
+        String url = request.getUrl();
 
         try {
-            HttpMethod httpMethod = request.getHttpMethod();
-            String url = request.getUrl();
             if (httpMethod == HttpMethod.GET) {
                 signer.get(request, new URL(url));
             } else if (httpMethod == HttpMethod.DELETE) {
