@@ -169,7 +169,7 @@ public class SmsDemo {
         endpoints.add("8613688807587");
 
         // 设置参数
-        // MessageIncludeSignFlag为true时，可以不传SignId, 但是内容中必须包含签名,如【华为云】您的验证码是:1234，请查收。签名以【】括起来放在内容头部或者尾部
+        // 请填写已经审批通过的推广类签名id
         smnRequest.setSignId("47f86cf7c9a7449d98ee61cf193a1060")
                 .setSmsTemplateId("bfda25c6406e42ddabad74b4a20f6d05")
                 .setEndpoints(endpoints);
