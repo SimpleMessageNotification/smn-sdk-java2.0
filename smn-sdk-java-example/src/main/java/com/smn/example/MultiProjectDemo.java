@@ -19,40 +19,15 @@ import com.smn.request.sms.SmsPublishRequest;
 import com.smn.response.sms.SmsPublishResponse;
 
 /**
- * 设置客户端参数 demo 项目
+ * 多project场景样例
  *
  * @author zhangyx
- * @version 2.0.0
+ * @version 2.0.4
  */
-public class ClientConfigurationDemo {
+public class MultiProjectDemo {
 
     public static void main(String[] args) {
         ClientConfiguration clientConfiguration = new ClientConfiguration();
-        // 设置连接超时时间，单位毫秒， 默认60000
-        clientConfiguration.setConnectTimeOut(80000);
-        // 设置socket超时时间，单位毫秒， 默认60000
-        clientConfiguration.setSocketTimeOut(80000);
-
-        // 设置最大http连接池
-        clientConfiguration.setMaxConnections(1000);
-        // 设置每个路由最大连接数
-        clientConfiguration.setMaxConnectionsPerRoute(1000);
-
-        // 忽略客户端证书校验
-        clientConfiguration.setIgnoreCertificate(true);
-        // 设置代理地址
-        clientConfiguration.setProxyHost("127.0.0.1");
-        // 设置代理端口
-        clientConfiguration.setProxyPort(808);
-        // 设置代理认证用户名
-        clientConfiguration.setProxyUserName("break");
-        // 设置代理认证密码
-        clientConfiguration.setProxyPassword("123456");
-
-        // 设置失败自动重试
-        clientConfiguration.setAutoFailRetry(true);
-        //设置重试次数
-        clientConfiguration.setMaxRetryNum(3);
 
         // 多子project场景下使用。
         // 这里设置smn和iam host地址，填主project的地址，如子project是在华北区创建的，
@@ -62,12 +37,13 @@ public class ClientConfigurationDemo {
         clientConfiguration.setIamHostUrl("https://iam.cn-north-1.myhuaweicloud.com");
 
         // 初始化
-        // 多子project场景下使用。regionName（YourMultiSubProjectName）应该填自定义的子project名，如cn-north-1_smn为自己定义的子project名
+        // regionName（YourMultiSubProjectName）填自定义的子project名，
+        // 如cn-north-1_smn为自己定义的子project名
         SmnClient smnClient = new DefaultSmnClient(
                 "YourAccountUserName",
                 "YourAccountDomainName",
                 "YourAccountPassword",
-                "YourRegionName",
+                "YourMultiSubProjectName",
                 clientConfiguration);
 
         // use aksk authentication
@@ -77,10 +53,9 @@ public class ClientConfigurationDemo {
 //                "YourRegionName",
 //                clientConfiguration);
 
-        // 发送短信，send sms
+        // 以下以发送短信为例，send sms
         smsPublish(smnClient);
     }
-
     /**
      * 发送短信
      */
@@ -107,3 +82,4 @@ public class ClientConfigurationDemo {
         }
     }
 }
+
