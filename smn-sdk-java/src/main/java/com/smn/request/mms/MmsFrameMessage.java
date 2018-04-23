@@ -26,8 +26,9 @@ public class MmsFrameMessage {
      */
     @JsonProperty("file_type")
     private String fileType;
+
     /**
-     * content_base63
+     * content_base64
      */
     @JsonProperty("content_base64")
     private String contentBase64;
