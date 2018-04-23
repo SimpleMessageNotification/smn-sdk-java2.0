@@ -48,11 +48,18 @@ public class ValidationUtil {
      */
     final static Pattern PATTERN_SUBJECT = Pattern.compile("^[^\\r\\n\\t\\f]+$");
 
+    /**
+     * validate is english
+     */
+    private static final Pattern PATTERN_EN = Pattern.compile("^\\p{ASCII}+$");
+
     private final static int MAX_TOPIC_DISPLAY_NAME = 192;
     private final static int MAX_TEMPLATE_MESSAGE_CONTENT_LENGTH = 256 * 1024;
     private final static int SIGN_MAX_LENGTH = 10;
     private final static char SIGNLABEL_CH_LEFT = '【';
     private final static char SIGNLABEL_CH_RIGHT = '】';
+    private final static char SIGNLABEL_EN_LEFT = '[';
+    private final static char SIGNLABEL_EN_RIGHT = ']';
     public final static int MAX_SMS_BATCH_PUBLISH_SIZE = 1000;
 
     /**
@@ -232,19 +239,32 @@ public class ValidationUtil {
         int scanLegth = message.length() > SIGN_MAX_LENGTH ? SIGN_MAX_LENGTH : message.length();
 
         // scan head
-        if (message.charAt(0) == SIGNLABEL_CH_LEFT) {
+        if (message.charAt(0) == SIGNLABEL_CH_LEFT || message.charAt(0) == SIGNLABEL_EN_LEFT) {
+            // 判断是否是中文标签
+            boolean isChLabel = message.charAt(0) == SIGNLABEL_CH_LEFT;
+            // 右闭合字符
+            char signLabelRightChar = isChLabel ? SIGNLABEL_CH_RIGHT : SIGNLABEL_EN_RIGHT;
+
             for (int i = 1; i < scanLegth; i++) {
-                if (message.charAt(i) == SIGNLABEL_CH_RIGHT) {
-                    return true;
+                if (message.charAt(i) == signLabelRightChar) {
+                    String signName = message.substring(1, i);
+                    return (!isChLabel && !PATTERN_EN.matcher(signName).matches()) ? false : true;
                 }
             }
         }
 
         // scan tail
-        if (message.charAt(message.length() - 1) == SIGNLABEL_CH_RIGHT) {
+        if (message.charAt(message.length() - 1) == SIGNLABEL_CH_RIGHT
+                || message.charAt(message.length() - 1) == SIGNLABEL_EN_RIGHT) {
+            // 判断是否是中文标签
+            boolean isChLabel = message.charAt(message.length() - 1) == SIGNLABEL_CH_RIGHT;
+            // 左闭合字符
+            char signLabelLeftChar = isChLabel ? SIGNLABEL_CH_LEFT : SIGNLABEL_EN_LEFT;
+
             for (int i = message.length() - 2; i > message.length() - scanLegth - 1; i--) {
-                if (message.charAt(i) == SIGNLABEL_CH_LEFT) {
-                    return true;
+                if (message.charAt(i) == signLabelLeftChar) {
+                    String signName = message.substring(i + 1, message.length() - 1);
+                    return (!isChLabel && !PATTERN_EN.matcher(signName).matches()) ? false : true;
                 }
             }
         }
