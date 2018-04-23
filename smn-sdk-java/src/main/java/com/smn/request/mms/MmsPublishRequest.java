@@ -90,6 +90,9 @@ public class MmsPublishRequest extends AbstractRequest<MmsPublishResponse> {
         return signId;
     }
 
+    public List<MmsFrame> getMmsMessage() {
+        return mmsMessage;
+    }
 
     public MmsPublishRequest setTitle(String title) {
         this.title = title;
@@ -107,10 +110,6 @@ public class MmsPublishRequest extends AbstractRequest<MmsPublishResponse> {
         this.signId = signId;
         this.bodyMap.put("sign_id", signId);
         return this;
-    }
-
-    public List<MmsFrame> getMmsMessage() {
-        return mmsMessage;
     }
 
     public MmsPublishRequest setMmsMessage(List<MmsFrame> mmsMessage) {
