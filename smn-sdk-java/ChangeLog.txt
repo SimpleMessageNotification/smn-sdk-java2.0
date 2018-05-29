@@ -16,3 +16,6 @@
 
 2018-04-08 version 2.0.4:
 1. Optimization of aksk algorithm and package import
+
+2018-05-29 version 2.0.5:
+1. fix json serialization
