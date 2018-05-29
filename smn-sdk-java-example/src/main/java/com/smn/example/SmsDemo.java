@@ -24,7 +24,7 @@ import java.util.List;
  * sms demo
  *
  * @author zhangyx
- * @version 2.0.0
+ * @version 2.0.5
  */
 public class SmsDemo {
     public static void main(String[] args) {
@@ -289,6 +289,7 @@ public class SmsDemo {
                         ", createTime='" + info.getCreateTime() + '\'' +
                         ", signId='" + info.getSignId() + '\'' +
                         ", reply='" + info.getReply() + '\'' +
+                        ", overseasFlag='" + info.getOverseasFlag() + '\'' +
                         ", status=" + info.getStatus() +
                         '}');
             }
