@@ -11,6 +11,7 @@
  */
 package com.smn.util;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -29,6 +30,11 @@ public class JsonUtil {
      * Object mapper root
      */
     private static final ObjectMapper OBJMAPPER = new ObjectMapper();
+
+    static {
+        // ingore unkowned feild
+        OBJMAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
 
     /**
      * Parsing a JSON string into a map object

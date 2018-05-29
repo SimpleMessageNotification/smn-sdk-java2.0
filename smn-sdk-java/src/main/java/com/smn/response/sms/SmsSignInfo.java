@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  *
  * @author zhangyx
  * @version 2.0.0
+ * @version 2.0.5
  */
 public class SmsSignInfo {
     @JsonProperty("sign_name")
@@ -37,6 +38,9 @@ public class SmsSignInfo {
 
     @JsonProperty("sign_type")
     private int signType;
+
+    @JsonProperty("overseas_flag")
+    private int overseasFlag;
 
     public String getSignName() {
         return signName;
@@ -84,5 +88,13 @@ public class SmsSignInfo {
 
     public void setSignType(int signType) {
         this.signType = signType;
+    }
+
+    public int getOverseasFlag() {
+        return overseasFlag;
+    }
+
+    public void setOverseasFlag(int overseasFlag) {
+        this.overseasFlag = overseasFlag;
     }
 }
