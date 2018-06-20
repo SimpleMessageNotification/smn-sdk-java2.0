@@ -48,6 +48,7 @@ public class Constants {
     public final static String SMS_TEMPLATE = "sms_template";
     public final static String SMS_PROMOTION = "promotion";
     public final static String BATCH_SMS = "batch_sms";
+    public static final String SMN_MMS= "mms";
 
     public final static String TOPICS = "topics";
     public final static String ATTRIBUTES = "attributes";
