@@ -11,6 +11,7 @@
  */
 package com.smn.request;
 
+import com.smn.common.Constants;
 import com.smn.config.ClientConfiguration;
 import com.smn.config.SmnConfiguration;
 import com.smn.http.HttpMethod;
@@ -117,13 +118,15 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
     /**
      * parse httpResponse
      *
-     * @param httpResponse the response data
+     * @param httpResponse
+     *            the response data
      * @return the response entity of the request
      */
     public T getResponse(HttpResponse httpResponse) {
         try {
             String responseMessage = httpResponse.getContent();
-            Class<? super T> rawType = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+            Class<? super T> rawType = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass())
+                    .getActualTypeArguments()[0];
             T t = (T) JsonUtil.parseJsonToObject(responseMessage, rawType);
             t.setHttpCode(httpResponse.getHttpCode());
             t.setContentString(responseMessage);
@@ -172,7 +175,14 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
         if (clientConfiguration != null && !StringUtil.isBlank(clientConfiguration.getSmnHostUrl())) {
             return clientConfiguration.getSmnHostUrl();
         }
-        return smnConfiguration.getSmnHostUrl();
+
+        String smnHostUrl = smnConfiguration.getSmnHostUrl();
+        if (smnHostUrl == null || Constants.HTTPS.equals(smnHostUrl.trim())) {
+            throw new RuntimeException("Not found smnHostUrl by regionId in the region_endpoint_key_val file !"
+                                               + "please use setSmnHostUrl(String smnHostUrl) of com.smn.config.ClientConfiguration to set smnHostUrl "
+                                               + "or add smnHostUrl entry in the region_endpoint_key_val file.");
+        }
+        return smnHostUrl;
     }
 
     /**
@@ -184,7 +194,14 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
         if (clientConfiguration != null && !StringUtil.isBlank(clientConfiguration.getIamHostUrl())) {
             return clientConfiguration.getIamHostUrl();
         }
-        return smnConfiguration.getIamHostUrl();
+
+        String iamHostUrl = smnConfiguration.getIamHostUrl();
+        if (iamHostUrl == null || Constants.HTTPS.equals(iamHostUrl.trim())) {
+            throw new RuntimeException("Not found iamHostUrl by regionId in the region_endpoint_key_val file !"
+                                               + "please use setIamHostUrl(String iamHostUrl) of com.smn.config.ClientConfiguration to set iamHostUrl "
+                                               + "or add iamHostUrl entry in the region_endpoint_key_val file.");
+        }
+        return iamHostUrl;
     }
 
     /**
