@@ -11,7 +11,14 @@
  */
 package com.smn.config;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.smn.common.Constants;
+import com.smn.util.StringUtil;
 
 /**
  * property loading configuration
@@ -77,37 +84,116 @@ public class SmnConfiguration {
     private String iamHostUrl;
 
     /**
+     * SMN region and endpoint key-value
+     */
+    private HashMap<String, String> smnRegionAndEndpoints = new HashMap<String, String>();
+
+    /**
+     * IAM region and endpoint key-value
+     */
+    private HashMap<String, String> iamRegionAndEndpoints = new HashMap<String, String>();
+
+    /**
      * new smnConfiguration
      *
-     * @param userName   the userName to set
-     * @param password   the password to set
-     * @param domainName the domain name to set
-     * @param regionId   the region id to set
+     * @param userName
+     *            the userName to set
+     * @param password
+     *            the password to set
+     * @param domainName
+     *            the domain name to set
+     * @param regionId
+     *            the region id to set
      */
     public SmnConfiguration(String userName, String password, String domainName, String regionId) {
+        init();
         this.userName = userName;
         this.password = password;
         this.domainName = domainName;
         this.regionName = regionId;
         this.authType = TOKEN_AUTH_TYPE;
-        this.smnHostUrl = Constants.HTTPS + Constants.SMN + "." + regionName + "." + Constants.ENDPOINT;
-        this.iamHostUrl  = Constants.HTTPS + Constants.IAM + "." + regionName + "." + Constants.ENDPOINT;
+        this.smnHostUrl = Constants.HTTPS + getEndpointByRegionId(smnRegionAndEndpoints, regionName);
+        this.iamHostUrl = Constants.HTTPS + getEndpointByRegionId(iamRegionAndEndpoints, regionName);
     }
 
     /**
      * new smnConfiguration
      *
-     * @param secretAccessKey the secretAccessKey id to set
-     * @param accessKeyId     the accessKeyId id to set
-     * @param regionId        the region id to set
+     * @param secretAccessKey
+     *            the secretAccessKey id to set
+     * @param accessKeyId
+     *            the accessKeyId id to set
+     * @param regionId
+     *            the region id to set
      */
     public SmnConfiguration(String accessKeyId, String secretAccessKey, String regionId) {
+        init();
         this.regionName = regionId;
         this.accessKeyId = accessKeyId;
         this.secretAccessKey = secretAccessKey;
         this.authType = AKSK_AUTH_TYPE;
-        this.smnHostUrl = Constants.HTTPS + Constants.SMN + "." + regionName + "." + Constants.ENDPOINT;
-        this.iamHostUrl  = Constants.HTTPS + Constants.IAM + "." + regionName + "." + Constants.ENDPOINT;
+        this.smnHostUrl = Constants.HTTPS + getEndpointByRegionId(smnRegionAndEndpoints, regionName);
+        this.iamHostUrl = Constants.HTTPS + getEndpointByRegionId(iamRegionAndEndpoints, regionName);
+    }
+
+    /**
+     * init smn/iam region and endpoint key-value
+     */
+    private void init() {
+        ClassLoader cls = this.getClass().getClassLoader();
+        InputStream fileInput = cls.getResourceAsStream("region_endpoint_key_val");
+        BufferedReader bufferedReader = null;
+        String line = null;
+        try {
+            bufferedReader = new BufferedReader(new InputStreamReader(fileInput));
+            while ((line = bufferedReader.readLine()) != null) {
+                line = line.trim();
+                if (line.startsWith(Constants.NOTE_SIGN) || StringUtil.isBlank(line)) {
+                    continue;
+                }
+                String[] items = line.split(Constants.DOUBLE_COLON);
+                if (items.length != Constants.ITEM_NUM) {
+                    throw new RuntimeException("'" + line + "' is invalid format");
+                }
+                if (Constants.SMN.equals(items[0])) {
+                    smnRegionAndEndpoints.put(items[1], items[2]);
+                } else if (Constants.IAM.equals(items[0])) {
+                    iamRegionAndEndpoints.put(items[1], items[2]);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage()+",Failed to load region_endpoint_key_val !");
+        } finally {
+            try {
+                if (bufferedReader != null) {
+                    bufferedReader.close();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to close region_endpoint_key_val reader !");
+            }
+
+        }
+
+    }
+
+    /**
+     * get smn/iam endpoint by main regionId
+     */
+    private String getEndpointByRegionId(Map<String, String> map, String regionId) {
+        String mainRegionId = null;
+        if (regionId != null) {
+            if (regionId.contains(Constants.UNDERLINE)) {
+                mainRegionId = regionId.split(Constants.UNDERLINE)[0];
+            } else {
+                mainRegionId = regionId;
+            }
+            if (!map.containsKey(mainRegionId)) {
+                return "";
+            }
+            return map.get(mainRegionId);
+        } else {
+            throw new RuntimeException("regionId is null !");
+        }
     }
 
     /**
@@ -117,14 +203,12 @@ public class SmnConfiguration {
         return userName;
     }
 
-
     /**
      * @return the password
      */
     public String getPassword() {
         return password;
     }
-
 
     /**
      * @return the domainName

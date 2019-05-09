@@ -1,0 +1,24 @@
+#every line is :smn_service_name regionId domain
+smn::cn-northeast-1::smn.cn-northeast-1.myhuaweicloud.com
+smn::cn-north-4::smn.cn-north-4.myhuaweicloud.com
+smn::cn-north-1::smn.cn-north-1.myhuaweicloud.com
+smn::cn-east-2::smn.cn-east-2.myhuaweicloud.com
+smn::cn-south-1::smn.cn-south-1.myhuaweicloud.com
+smn::af-south-1::smn.af-south-1.myhuaweicloud.com
+smn::cn-southwest-2::smn.cn-southwest-2.myhuaweicloud.com
+smn::eu-west-0::smn.eu-west-0.myhuaweicloud.com
+smn::ap-southeast-3::smn.ap-southeast-3.myhuaweicloud.com
+smn::ap-southeast-1::smn.ap-southeast-1.myhuaweicloud.com
+smn::ap-southeast-2::smn.ap-southeast-2.myhuaweicloud.com
+
+#every line is :iam_service_name regionId domain
+iam::cn-northeast-1::iam.cn-northeast-1.myhuaweicloud.com
+iam::cn-north-4::iam.cn-north-4.myhuaweicloud.com
+iam::cn-north-1::iam.cn-north-1.myhuaweicloud.com
+iam::cn-east-2::iam.cn-east-2.myhuaweicloud.com
+iam::cn-south-1::iam.cn-south-1.myhuaweicloud.com
+iam::af-south-1::iam.af-south-1.myhuaweicloud.com
+iam::eu-west-0::iam.eu-west-0.myhuaweicloud.com
+iam::ap-southeast-1::iam.ap-southeast-1.myhwclouds.com
+iam::ap-southeast-2::iam.ap-southeast-2.myhuaweicloud.com
+iam::ap-southeast-3::iam.ap-southeast-3.myhuaweicloud.com
