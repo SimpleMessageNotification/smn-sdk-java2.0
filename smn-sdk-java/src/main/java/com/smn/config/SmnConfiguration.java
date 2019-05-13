@@ -182,7 +182,10 @@ public class SmnConfiguration {
     private String getEndpointByRegionId(Map<String, String> map, String regionId) {
         String mainRegionId = null;
         if (regionId != null) {
-            if (regionId.contains(Constants.UNDERLINE)) {
+            //region id may be 'DeC_cn-north-1_MyDec01' or 'cn-north-1_MyDec01' or 'cn-north-1'
+            if(regionId.toLowerCase().startsWith(Constants.DEC)){
+                mainRegionId = regionId.split(Constants.UNDERLINE)[1];
+            }else if (regionId.contains(Constants.UNDERLINE)) {
                 mainRegionId = regionId.split(Constants.UNDERLINE)[0];
             } else {
                 mainRegionId = regionId;
