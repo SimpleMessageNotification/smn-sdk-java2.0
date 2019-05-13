@@ -62,6 +62,6 @@ public class Constants {
     public final static String UNDERLINE = "_";
     public final static String NOTE_SIGN = "#";
     public final static int ITEM_NUM = 3;
-
+    public final static String DEC = "dec";
 
 }
