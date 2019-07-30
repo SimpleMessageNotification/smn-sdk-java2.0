@@ -19,23 +19,23 @@ public class BinaryUtils {
     /**
      * convert byte[] to hex string
      *
-     * @param data src byte[] data
+     * @param bytesData src byte[] data
      * @return hex String
      */
-    public static String toHex(byte[] data) {
-        StringBuilder sb = new StringBuilder(data.length * 2);
+    public static String toHex(byte[] bytesData) {
+        StringBuilder stringBuilder = new StringBuilder(bytesData.length * 2);
 
-        for (int i = 0; i < data.length; i++) {
-            String hex = Integer.toHexString(data[i]);
-            if (hex.length() == 1) {
-                sb.append("0");
-            } else if (hex.length() == 8) {
-                hex = hex.substring(6);
+        for (int index = 0; index < bytesData.length; index++) {
+            String hexString = Integer.toHexString(bytesData[index]);
+            if (hexString.length() == 1) {
+                stringBuilder.append("0");
+            } else if (hexString.length() == 8) {
+                hexString = hexString.substring(6);
             }
 
-            sb.append(hex);
+            stringBuilder.append(hexString);
         }
 
-        return sb.toString().toLowerCase(Locale.getDefault());
+        return stringBuilder.toString().toLowerCase(Locale.getDefault());
     }
 }

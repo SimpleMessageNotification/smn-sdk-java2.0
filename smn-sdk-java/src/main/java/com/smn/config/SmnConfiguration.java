@@ -84,6 +84,10 @@ public class SmnConfiguration {
     private String iamHostUrl;
 
     /**
+     * iam global host
+     */
+    private String iamGlobalUrl;
+    /**
      * SMN region and endpoint key-value
      */
     private HashMap<String, String> smnRegionAndEndpoints = new HashMap<String, String>();
@@ -93,6 +97,10 @@ public class SmnConfiguration {
      */
     private HashMap<String, String> iamRegionAndEndpoints = new HashMap<String, String>();
 
+    /**
+     * IAM region and endpoint key-value
+     */
+    private HashMap<String, String> iamGlobalRegionAndEndpoints = new HashMap<String, String>();
     /**
      * new smnConfiguration
      *
@@ -114,6 +122,7 @@ public class SmnConfiguration {
         this.authType = TOKEN_AUTH_TYPE;
         this.smnHostUrl = Constants.HTTPS + getEndpointByRegionId(smnRegionAndEndpoints, regionName);
         this.iamHostUrl = Constants.HTTPS + getEndpointByRegionId(iamRegionAndEndpoints, regionName);
+        this.iamGlobalUrl = Constants.HTTPS + getEndpointByRegionId(iamGlobalRegionAndEndpoints,  Constants.IAM_ALL);
     }
 
     /**
@@ -134,6 +143,7 @@ public class SmnConfiguration {
         this.authType = AKSK_AUTH_TYPE;
         this.smnHostUrl = Constants.HTTPS + getEndpointByRegionId(smnRegionAndEndpoints, regionName);
         this.iamHostUrl = Constants.HTTPS + getEndpointByRegionId(iamRegionAndEndpoints, regionName);
+        this.iamGlobalUrl = Constants.HTTPS + getEndpointByRegionId(iamGlobalRegionAndEndpoints,  Constants.IAM_ALL);
     }
 
     /**
@@ -157,8 +167,10 @@ public class SmnConfiguration {
                 }
                 if (Constants.SMN.equals(items[0])) {
                     smnRegionAndEndpoints.put(items[1], items[2]);
-                } else if (Constants.IAM.equals(items[0])) {
+                } else if (Constants.IAM_REGION.equals(items[0])) {
                     iamRegionAndEndpoints.put(items[1], items[2]);
+                }else if (Constants.IAM_PROJECT_ID.equals(items[0])) {
+                    iamGlobalRegionAndEndpoints.put(items[1], items[2]);
                 }
             }
         } catch (Exception e) {
@@ -261,4 +273,9 @@ public class SmnConfiguration {
     public String getIamHostUrl() {
         return iamHostUrl;
     }
+
+    /**
+     * @return the iam global host
+     */
+    public String getIamGlobalUrl() { return iamGlobalUrl; }
 }

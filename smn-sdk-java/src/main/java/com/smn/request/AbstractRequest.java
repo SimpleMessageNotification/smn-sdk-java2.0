@@ -205,6 +205,26 @@ public abstract class AbstractRequest<T extends AbstractResponse> implements IHt
     }
 
     /**
+     * get iam global url
+     *
+     * @return iam global url
+     */
+    protected String getIamGlobalUrl() {
+        if (clientConfiguration != null && !StringUtil.isBlank(clientConfiguration.getIamGlobalUrl())) {
+            return clientConfiguration.getIamGlobalUrl();
+        }
+
+        String iamGlobalUrl = smnConfiguration.getIamGlobalUrl();
+        if (iamGlobalUrl == null || Constants.HTTPS.equals(iamGlobalUrl.trim())) {
+            throw new RuntimeException("Not found iamGlobalUrl by global param in the region_endpoint_key_val file !"
+                    + "please use setIamGlobalUrl(String iamGlobalUrl) of com.smn.config.ClientConfiguration to set" +
+                    " iamGlobalUrl "
+                    + "or add iamGlobalUrl entry in the region_endpoint_key_val file.");
+        }
+        return iamGlobalUrl;
+    }
+
+    /**
      * get project id for get method
      *
      * @return project id

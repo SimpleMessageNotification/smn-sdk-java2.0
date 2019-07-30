@@ -1,4 +1,5 @@
 #every line is :smn_service_name regionId domain
+#note: access smn service using the domain name
 smn::cn-northeast-1::smn.cn-northeast-1.myhuaweicloud.com
 smn::cn-north-4::smn.cn-north-4.myhuaweicloud.com
 smn::cn-north-1::smn.cn-north-1.myhuaweicloud.com
@@ -12,13 +13,18 @@ smn::ap-southeast-1::smn.ap-southeast-1.myhuaweicloud.com
 smn::ap-southeast-2::smn.ap-southeast-2.myhuaweicloud.com
 
 #every line is :iam_service_name regionId domain
-iam::cn-northeast-1::iam.cn-northeast-1.myhuaweicloud.com
-iam::cn-north-4::iam.cn-north-4.myhuaweicloud.com
-iam::cn-north-1::iam.cn-north-1.myhuaweicloud.com
-iam::cn-east-2::iam.cn-east-2.myhuaweicloud.com
-iam::cn-south-1::iam.cn-south-1.myhuaweicloud.com
-iam::af-south-1::iam.af-south-1.myhuaweicloud.com
-iam::eu-west-0::iam.eu-west-0.myhuaweicloud.com
-iam::ap-southeast-1::iam.ap-southeast-1.myhwclouds.com
-iam::ap-southeast-2::iam.ap-southeast-2.myhuaweicloud.com
-iam::ap-southeast-3::iam.ap-southeast-3.myhuaweicloud.com
+#note: To get token using the domain name
+iam_region::cn-northeast-1::iam.cn-northeast-1.myhuaweicloud.com
+iam_region::cn-north-1::iam.cn-north-1.myhuaweicloud.com
+iam_region::cn-north-4::iam.cn-north-1.myhuaweicloud.com
+iam_region::cn-east-2::iam.cn-east-2.myhuaweicloud.com
+iam_region::cn-east-3::iam.cn-east-3.myhuaweicloud.com
+iam_region::cn-south-1::iam.cn-south-1.myhuaweicloud.com
+iam_region::af-south-1::iam.af-south-1.myhuaweicloud.com
+iam_region::eu-west-0::iam.eu-west-0.myhuaweicloud.com
+iam_region::ap-southeast-1::iam.ap-southeast-1.myhwclouds.com
+iam_region::ap-southeast-2::iam.ap-southeast-2.myhuaweicloud.com
+iam_region::ap-southeast-3::iam.ap-southeast-3.myhuaweicloud.com
+
+#note: To get user's project id using the domain name
+iam_project_id::ALL::iam.myhuaweicloud.com
