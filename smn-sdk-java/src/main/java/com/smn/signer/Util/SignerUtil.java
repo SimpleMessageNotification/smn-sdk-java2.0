@@ -82,18 +82,18 @@ public class SignerUtil {
     /**
      * check is using default port
      *
-     * @param uri uri
+     * @param requestUri uri
      * @return {@code boolean} true using default port
      */
-    public static boolean isUsingNonDefaultPort(URI uri) {
-        String scheme = uri.getScheme().toLowerCase();
-        int port = uri.getPort();
-        if (port <= 0) {
+    public static boolean isNotUsingDefaultPort(URI requestUri) {
+        String urlScheme = requestUri.getScheme().toLowerCase();
+        int urlPort = requestUri.getPort();
+        if (!(urlPort > 0)) {
             return false;
-        } else if (scheme.equals("http") && port == 80) {
+        } else if (urlScheme.equals("http") && urlPort == 80) {
             return false;
         } else {
-            return !scheme.equals("https") || port != 443;
+            return !urlScheme.equals("https") || urlPort != 443;
         }
     }
 

@@ -33,7 +33,7 @@ public class GetProjectIdRequest extends AbstractRequest {
 
     public String getUrl() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getIamServiceUrl());
+        sb.append(getIamGlobalUrl());
         sb.append(Constants.IAM_PROJECT_URL);
 
         // set query parameters

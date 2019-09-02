@@ -47,7 +47,7 @@ public class DefaultSigner {
 
     private void addHostHeader(SignerRequest request) {
         StringBuilder hostHeaderBuilder = new StringBuilder(request.getEndpoint().getHost());
-        if (SignerUtil.isUsingNonDefaultPort(request.getEndpoint())) {
+        if (SignerUtil.isNotUsingDefaultPort(request.getEndpoint())) {
             hostHeaderBuilder.append(":").append(request.getEndpoint().getPort());
         }
 

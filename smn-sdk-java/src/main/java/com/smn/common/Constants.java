@@ -27,7 +27,9 @@ public class Constants {
     public final static String DEFAULT_CHARSET = "UTF-8";
     public static final String HTTPS = "https://";
     public static final String ENDPOINT = "myhuaweicloud.com";
-    public static final String IAM = "iam";
+    public static final String IAM_REGION = "iam_region";
+    public static final String IAM_PROJECT_ID = "iam_project_id";
+    public static final String IAM_ALL = "ALL";
     public static final String SMN = "smn";
     public static final String URL_DELIMITER = "/";
     public static final String V2 = "v2";

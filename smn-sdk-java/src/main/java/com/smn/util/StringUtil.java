@@ -13,20 +13,20 @@ package com.smn.util;
 
 public class StringUtil {
 
-    public static boolean isEmpty(CharSequence cs) {
-        return cs == null || cs.length() == 0;
-    }
-
-    public static boolean isBlank(final CharSequence cs) {
-        int strLen;
-        if (cs == null || (strLen = cs.length()) == 0) {
+    public static boolean isBlank(final CharSequence charSequence) {
+        int charSequenceLen;
+        if ( null == charSequence || 0 == (charSequenceLen = charSequence.length())) {
             return true;
         }
-        for (int i = 0; i < strLen; i++) {
-            if (Character.isWhitespace(cs.charAt(i)) == false) {
+        for (int index = 0; index < charSequenceLen; index++) {
+            if (!Character.isWhitespace(charSequence.charAt(index))) {
                 return false;
             }
         }
         return true;
+    }
+
+    public static boolean isEmpty(CharSequence charSequence) {
+        return  null == charSequence || 0 == charSequence.length();
     }
 }

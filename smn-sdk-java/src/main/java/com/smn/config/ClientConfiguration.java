@@ -123,6 +123,10 @@ public class ClientConfiguration {
     private String iamHostUrl;
 
     /**
+     * iam global host
+     */
+    private String iamGlobalUrl;
+    /**
      * @return isAutoFailRetry
      */
     public boolean isAutoFailRetry() {
@@ -403,5 +407,16 @@ public class ClientConfiguration {
     public ClientConfiguration setTrustStorePass(String trustStorePass) {
         this.trustStorePass = trustStorePass;
         return this;
+    }
+
+    /**
+     * @return To get user's project id using the url
+     */
+    public String getIamGlobalUrl() {
+        return iamGlobalUrl;
+    }
+
+    public void setIamGlobalUrl(String iamGlobalUrl) {
+        this.iamGlobalUrl = iamGlobalUrl;
     }
 }
