@@ -11,7 +11,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <httpclient.version>4.5.7</httpclient.version>
+        <httpclient.version>4.5.13</httpclient.version>
         <jackson-databind.version>2.9.9</jackson-databind.version>
         <joda-time.version>2.9.9</joda-time.version>
         <apigateway.version>2.0.1</apigateway.version>
