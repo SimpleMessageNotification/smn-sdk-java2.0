@@ -10,7 +10,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <httpclient.version>4.5.7</httpclient.version>
-        <jackson-databind.version>2.9.9</jackson-databind.version>
+        <jackson-databind.version>2.12.6.1</jackson-databind.version>
         <joda-time.version>2.9.9</joda-time.version>
         <apigateway.version>2.0.1</apigateway.version>
         <compile.version>1.5</compile.version>
